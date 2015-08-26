@@ -11,6 +11,7 @@
 #ifndef LIBN64_RCP_MI_H
 #define LIBN64_RCP_MI_H
 #include <stddef.h>
+#include <stdint.h>
 
 #define MI_INTR_CLEAR_SP                    (1 <<  0)
 #define MI_INTR_SET_SP                      (1 <<  1)

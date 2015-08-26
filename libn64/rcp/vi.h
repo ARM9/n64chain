@@ -11,6 +11,7 @@
 #ifndef LIBN64_RCP_VI_H
 #define LIBN64_RCP_VI_H
 #include <stddef.h>
+#include <stdint.h>
 
 typedef struct vi_state_t {
 	uint32_t status;

@@ -9,33 +9,33 @@
 #
 
 ifdef SystemRoot
-FIXPATH = $(subst /,\,$1)
-RM = del /Q
+FIXPATH := $(subst /,\,$1)
+RM := del /Q
 else
 FIXPATH = $1
-RM = rm -f
+RM := rm -f
 endif
 
-AS = $(call FIXPATH,$(CURDIR)/../tools/bin/mips64-elf-as)
-AR = $(call FIXPATH,$(CURDIR)/../tools/bin/mips64-elf-gcc-ar)
-CC = $(call FIXPATH,$(CURDIR)/../tools/bin/mips64-elf-gcc)
+AS := mips64-elf-as
+AR := mips64-elf-gcc-ar
+CC := mips64-elf-gcc
 
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -I. -Iinclude
-OPTFLAGS = -Os -march=vr4300 -flto -ffat-lto-objects \
+CFLAGS := -Wall -Wextra -pedantic -std=c99 -I. -Iinclude
+OPTFLAGS := -Os -march=vr4300 -flto -ffat-lto-objects \
 	-mgpopt -G8 -mno-extern-sdata
 
-ASMFILES = $(call FIXPATH,\
+ASMFILES := $(call FIXPATH,\
 	libc/crt0.S \
 )
 
-CFILES = $(call FIXPATH,\
+CFILES := $(call FIXPATH,\
 )
 
-OBJFILES = \
+OBJFILES := \
 	$(ASMFILES:.S=.o) \
 	$(CFILES:.c=.o)
 
-DEPFILES = $(OBJFILES:.o=.d)
+DEPFILES := $(OBJFILES:.o=.d)
 
 #
 # Primary targets.

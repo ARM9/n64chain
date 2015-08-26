@@ -11,6 +11,8 @@
 #ifndef LIBN64_VR4300_CP0_H
 #define LIBN64_VR4300_CP0_H
 
+#include <stdint.h>
+
 //
 // Disables VR4300 interrupts.
 //
