@@ -10,8 +10,26 @@
 
 #ifndef LIBN64_RCP_RSP_H
 #define LIBN64_RCP_RSP_H
-#include <stddef.h>
-#include <stdint.h>
+
+#include <mmio.h>
+
+#define RSP_MEM_BASE     0xA4000000 // $04000000..$04000FFF SP MEM Base Register
+#define RSP_DMEM         IO_32(SP_MEM_BASE,0x0000) // $04000000..$04000FFF SP: RSP DMEM (4096 Bytes)
+#define RSP_IMEM         IO_32(SP_MEM_BASE,0x1000) // $04001000..$04001FFF SP: RSP IMEM (4096 Bytes)
+
+#define RSP_BASE         0xA4040000 // $04040000..$0404001F SP Base Register
+#define RSP_MEM_ADDR     IO_32(SP_BASE,0x00) // $04040000..$04040003 SP: Master, SP Memory Address Register
+#define RSP_DRAM_ADDR    IO_32(SP_BASE,0x04) // $04040004..$04040007 SP: Slave, SP DRAM DMA Address Register
+#define RSP_RD_LEN       IO_32(SP_BASE,0x08) // $04040008..$0404000B SP: Read DMA Length Register
+#define RSP_WR_LEN       IO_32(SP_BASE,0x0C) // $0404000C..$0404000F SP: Write DMA Length Register
+#define RSP_STATUS       IO_32(SP_BASE,0x10) // $04040010..$04040013 SP: Status Register
+#define RSP_DMA_FULL     IO_32(SP_BASE,0x14) // $04040014..$04040017 SP: DMA Full Register
+#define RSP_DMA_BUSY     IO_32(SP_BASE,0x18) // $04040018..$0404001B SP: DMA Busy Register
+#define RSP_SEMAPHORE    IO_32(SP_BASE,0x1C) // $0404001C..$0404001F SP: Semaphore Register
+
+#define RSP_PC_BASE      0xA4080000 // $04080000..$04080007 SP PC Base Register
+#define RSP_PC           IO_32(SP_PC_BASE,0x00) // $04080000..$04080003 SP: PC Register
+#define RSP_IBIST_REG    IO_32(SP_PC_BASE,0x04) // $04080004..$04080007 SP: IMEM BIST Register
 
 #define RSP_STATUS_CLEAR_HALT               (1 <<  0)
 #define RSP_STATUS_SET_HALT                 (1 <<  1)
@@ -39,6 +57,9 @@
 #define RSP_STATUS_CLEAR_SIGNAL_7           (1 << 23)
 #define RSP_STATUS_SET_SIGNAL_7             (1 << 24)
 
+#ifndef __LANGUAGE_ASSEMBLY
+#include <stddef.h>
+#include <stdint.h>
 //
 // Issues a DMA to the RSP.
 //
@@ -54,7 +75,7 @@ static inline void rsp_issue_dma_to_rsp(
     "sw %[len], 0x08(%[sp_region])\n\t"
 
     :: [paddr] "r" (paddr), [sp_addr] "r" (sp_addr), [len] "r" (len),
-       [sp_region] "r" (0xA4040000U)
+       [sp_region] "r" (RSP_BASE)
   );
 }
 
@@ -64,14 +85,14 @@ static inline void rsp_issue_dma_to_rsp(
 // Returns 1 if a DMA is pending, 0 otherwise.
 //
 static inline uint32_t rsp_is_dma_pending(void) {
-  return *(volatile const uint32_t *) 0xA4040018;
+  return *RSP_DMA_BUSY;
 }
 
 //
 // Sets the RSP PC register.
 //
 static inline void rsp_set_pc(uint32_t pc) {
-  *(volatile uint32_t *) 0xA4080000 = pc;
+  *RSP_PC = pc;
 }
 
 //
@@ -80,8 +101,9 @@ static inline void rsp_set_pc(uint32_t pc) {
 // (see RSP_STATUS_CLEAR_* and RSP_STATUS_SET_*)
 //
 static inline void rsp_set_status(uint32_t mask) {
-  *(volatile uint32_t *) 0xA4040010 = mask;
+  *RSP_STATUS = mask;
 }
+#endif
 
 #endif
 

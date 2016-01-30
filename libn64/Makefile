@@ -20,7 +20,7 @@ AS := mips64-elf-as
 AR := mips64-elf-gcc-ar
 CC := mips64-elf-gcc
 
-CFLAGS := -Wall -Wextra -pedantic -std=c99 -I. -Iinclude
+CFLAGS := -Wall -Wextra -pedantic -std=c99 -fno-builtin -nostdinc -I. -Iinclude
 OPTFLAGS := -Os -march=vr4300 -flto -ffat-lto-objects \
 	-mgpopt -G8 -mno-extern-sdata
 
@@ -29,6 +29,9 @@ ASMFILES := $(call FIXPATH,\
 )
 
 CFILES := $(call FIXPATH,\
+	libc/math.c \
+	libc/time.c \
+	libc/stdlib.c \
 )
 
 OBJFILES := \

@@ -13,11 +13,10 @@
 #
 .section .ipl_handoff, "ax", @progbits
 
+.align 5
 .global __ipl_handoff
 .type	__ipl_handoff, @function
 __ipl_handoff:
-
-.align 5
 
 .set noat
 .set noreorder
@@ -36,20 +35,43 @@ __ipl_handoff:
 	# Set the global pointer reference value.
 	la $gp, _gp
 
-  # Set CP0/1 usable, disable interrupts
-  # and enable 64-bit modes for k/s/u.
+    # Set CP0/1 usable, disable interrupts
+    # and enable 64-bit modes for k/s/u.
 	lui $v0, 0x3000
 	ori $v0, $v0, 0x04E0
 	mtc0 $v0, $12
 
-  # Clear out cause bits and jump to main.
-  jal main
+    jal __init_sections
+    nop
+    # Clear out cause bits and jump to main.
+    jal main
 	mtc0 $zero, $13
 
-  # We shouldn't get here, but just in case...
+    # We shouldn't get here, but just in case...
 __ipl_handoff_spin:
-  j __ipl_handoff_spin
-  nop
+    j __ipl_handoff_spin
+    nop
+
+__init_sections:
+    la $a0, __bss_start
+    la $a1, __bss_end
+    beq $a0, $a1, 1f
+0:
+    addiu $a0, 4
+    bne $a0, $a1, 0b
+    sw $0, 0($a0)
+1:
+    // TODO align __sbss2_end in rom.ld?
+    la $a0, __sbss2_start
+    la $a1, __sbss2_end
+    beq $a0, $a1, 1f
+0:
+    addiu $a0, 1
+    bne $a0, $a1, 0b
+    sb $0, 0($a0)
+1:
+    jr $ra
+    nop
 
 .set at
 .set reorder
