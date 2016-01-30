@@ -53,23 +53,20 @@ __ipl_handoff_spin:
     nop
 
 __init_sections:
-    la $a0, __bss_start
+    la $a0, __bss_start-4
     la $a1, __bss_end
-    beq $a0, $a1, 1f
 0:
     addiu $a0, 4
-    bne $a0, $a1, 0b
+    bnel $a0, $a1, 0b
     sw $0, 0($a0)
-1:
     // TODO align __sbss2_end in rom.ld?
-    la $a0, __sbss2_start
+    la $a0, __sbss2_start-1
     la $a1, __sbss2_end
-    beq $a0, $a1, 1f
 0:
     addiu $a0, 1
-    bne $a0, $a1, 0b
+    bnel $a0, $a1, 0b
     sb $0, 0($a0)
-1:
+
     jr $ra
     nop
 
