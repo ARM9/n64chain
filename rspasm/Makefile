@@ -22,6 +22,10 @@ FLEX = flex
 CFLAGS = -Wall -Wextra -Wno-unused-parameter -pedantic -std=c99 -I. -D_POSIX_C_SOURCE
 OPTFLAGS = -O2
 
+ifneq ($(UNAME_S),Darwin)
+CFLAGS += -static
+endif
+
 CFILES = \
 	emitter.c \
 	lexer.c \
@@ -38,7 +42,7 @@ all: rspasm
 
 rspasm: $(OBJFILES)
 	@echo $(call FIXPATH,"Linking: rspasm/$@")
-	@$(CC) -static $(CFLAGS) $(OPTFLAGS) $^ $(RSPASM_LIBS) -o $@
+	@$(CC) $(CFLAGS) $(OPTFLAGS) $^ $(RSPASM_LIBS) -o $@
 
 parser.c: parser.y
 	@echo $(call FIXPATH,"Generating: rspasm/$@")

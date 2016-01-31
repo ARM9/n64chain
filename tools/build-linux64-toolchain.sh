@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eu
 
 #
 # tools/build-linux64-toolchain.sh: Linux toolchain build script.
@@ -15,10 +15,10 @@ BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.25.tar.bz2"
 GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-5.2.0/gcc-5.2.0.tar.bz2"
 MAKE="ftp://ftp.gnu.org/gnu/make/make-4.1.tar.bz2"
 
-export PATH="${PATH}:${SCRIPT_DIR}/bin"
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
+
+export PATH="${PATH}:${SCRIPT_DIR}/bin"
 
 if [ ! -f stamps/binutils-download ]; then
   wget "${BINUTILS}" -O "tarballs/$(basename ${BINUTILS})"
@@ -75,6 +75,14 @@ if [ ! -f stamps/gcc-extract ]; then
   mkdir -p gcc-{build,source}
   tar -xf tarballs/$(basename ${GCC}) -C gcc-source --strip 1
   touch stamps/gcc-extract
+fi
+
+if [ ! -f stamps/gcc-prereq ]; then
+  pushd gcc-source
+    ./contrib/download_prerequisites
+  popd
+
+  touch stamps/gcc-prereq
 fi
 
 if [ ! -f stamps/gcc-configure ]; then
@@ -173,21 +181,24 @@ if [ ! -f stamps/make-install ]; then
 fi
 
 if [ ! -f stamps/checksum-build ]; then
-  cc -Wall -Wextra -pedantic -std=c99 -static -O2 checksum.c -o bin/checksum
+  CFLAGS="-Wall -Wextra -pedantic -std=c99 -O2"
+  if [[ "$OSTYPE" != "darwin"* ]]; then
+    CFLAGS="$CFLAGS -static"
+  fi
+  cc ${CFLAGS} checksum.c -o bin/checksum
 
   touch stamps/checksum-build
 fi
 
 if [ ! -f stamps/rspasm-build ]; then
   pushd "${SCRIPT_DIR}/../rspasm"
-
   make clean && make all
   cp rspasm ${SCRIPT_DIR}/bin
+  popd
+
+  touch stamps/rspasm-build
 fi
 
-rm -rf "${SCRIPT_DIR}"/../tools/tarballs
-rm -rf "${SCRIPT_DIR}"/../tools/*-source
-rm -rf "${SCRIPT_DIR}"/../tools/*-build
-rm -rf "${SCRIPT_DIR}"/../tools/stamps
+rm -rf tarballs *-source *-build stamps
 exit 0
 
