@@ -16,9 +16,12 @@ FIXPATH = $1
 RM := rm -f
 endif
 
-AS := mips64-elf-as
-AR := mips64-elf-gcc-ar
-CC := mips64-elf-gcc
+SDK_DIR := $(call FIXPATH,$(CURDIR)/../tools)
+N64_GCC_PREFIX := $(call FIXPATH,$(SDK_DIR)/bin/mips64-elf-)
+
+AS := $(N64_GCC_PREFIX)as
+AR := $(N64_GCC_PREFIX)ar
+CC := $(N64_GCC_PREFIX)gcc
 
 CFLAGS := -Wall -Wextra -pedantic -std=c99 -fno-builtin -nostdinc -I. -Iinclude
 OPTFLAGS := -Os -march=vr4300 -flto -ffat-lto-objects \

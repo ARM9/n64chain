@@ -16,40 +16,48 @@ FIXPATH = $1
 RM = rm -f
 endif
 
-ROM_NAME = $(notdir $(CURDIR))
+ROM_NAME := $(notdir $(CURDIR))
 
-AS = $(call FIXPATH,$(CURDIR)/../tools/bin/mips64-elf-as)
-AR = $(call FIXPATH,$(CURDIR)/../tools/bin/mips64-elf-gcc-ar)
-CC = $(call FIXPATH,$(CURDIR)/../tools/bin/mips64-elf-gcc)
-MAKE = $(call FIXPATH,$(CURDIR)/../tools/bin/make)
-OBJCOPY = $(call FIXPATH,$(CURDIR)/../tools/bin/mips64-elf-objcopy)
+LIBN64DIR := $(call FIXPATH,../libn64)
+LIBN64 := $(call FIXPATH,$(LIBN64DIR)/libn64.a)
+LDSCRIPT := $(call FIXPATH,$(LIBN64DIR)/rom.ld)
+ROM_HEADER := $(call FIXPATH,$(LIBN64DIR)/header.bin)
 
-CHECKSUM = $(call FIXPATH,$(CURDIR)/../tools/bin/checksum)
-RSPASM = $(call FIXPATH,$(CURDIR)/../tools/bin/rspasm)
+TOOLSDIR := $(call FIXPATH,$(CURDIR)/../tools)
+N64_GCC_PREFIX := $(call FIXPATH,$(TOOLSDIR)/bin/mips64-elf-)
 
-CFLAGS = -Wall -Wextra -pedantic -std=c99 \
-	-I../libn64/include -I../libn64 -I.
-OPTFLAGS = -Os -march=vr4300 -flto -ffat-lto-objects \
+AS := $(N64_GCC_PREFIX)as
+AR := $(N64_GCC_PREFIX)ar
+CC := $(N64_GCC_PREFIX)gcc
+OBJCOPY := $(N64_GCC_PREFIX)objcopy
+
+MAKE := $(call FIXPATH,$(TOOLSDIR)/bin/make)
+RSPASM := $(call FIXPATH,$(TOOLSDIR)/bin/rspasm)
+CHECKSUM := $(call FIXPATH,$(TOOLSDIR)/bin/checksum)
+
+CFLAGS := -Wall -Wextra -pedantic -std=c99 \
+	-I$(LIBN64DIR)/include -I$(LIBN64DIR) -I.
+OPTFLAGS := -Os -march=vr4300 -flto -ffat-lto-objects \
 	-mgpopt -G8 -mno-extern-sdata
 
-ASMFILES = $(call FIXPATH,\
+ASMFILES := $(call FIXPATH,\
 	src/graphics.S \
 )
 
-CFILES = $(call FIXPATH,\
+CFILES := $(call FIXPATH,\
 	src/main.c \
 )
 
-UCODES = $(call FIXPATH,\
+UCODES := $(call FIXPATH,\
 	src/graphics.rsp \
 )
 
-OBJFILES = \
+OBJFILES := \
 	$(ASMFILES:.S=.o) \
 	$(CFILES:.c=.o)
 
-UCODEBINS = $(UCODES:.rsp=.bin)
-DEPFILES = $(OBJFILES:.o=.d)
+UCODEBINS := $(UCODES:.rsp=.bin)
+DEPFILES := $(OBJFILES:.o=.d)
 
 #
 # Primary targets.
@@ -59,13 +67,21 @@ all: $(ROM_NAME).z64
 $(ROM_NAME).z64: $(ROM_NAME).elf
 	@echo $(call FIXPATH,"Building: $(ROM_NAME)/$@")
 	@$(OBJCOPY) -O binary $< $@
-	@$(CHECKSUM) $(call FIXPATH,../libn64/header.bin) $@
+	@$(CHECKSUM) $(ROM_HEADER) $@
 
-$(ROM_NAME).elf: libn64 $(OBJFILES)
+#
+# Link compiled targets
+#
+$(ROM_NAME).elf: $(LIBN64) $(OBJFILES)
 	@echo $(call FIXPATH,"Building: $(ROM_NAME)/$@")
-	@$(CC) $(CFLAGS) $(OPTFLAGS) -Wl,-Map=$(ROM_NAME).map -nostdlib \
-		-T$(call FIXPATH,../libn64/rom.ld) -o $@ $(OBJFILES) \
-		-L$(call FIXPATH,../libn64) -ln64
+	@$(CC) $(CFLAGS) $(OPTFLAGS) -nostdlib \
+		-Wl,-Map=$(ROM_NAME).map \
+		-T$(LDSCRIPT) \
+		-L$(LIBN64DIR) -ln64 \
+		-o $@ $(OBJFILES)
+
+$(LIBN64):
+	@$(MAKE) -sC $(LIBN64DIR)
 
 #
 # Generic compilation/assembly targets.
@@ -82,10 +98,6 @@ $(call FIXPATH,src/graphics.o): $(call FIXPATH,src/graphics.S) $(call FIXPATH,sr
 %.bin: %.rsp
 	@echo $(call FIXPATH,"Assembling: $(ROM_NAME)/$<")
 	@$(RSPASM) -o $@ $<
-
-.PHONY: libn64
-libn64:
-	@$(MAKE) -sC $(call FIXPATH,../libn64)
 
 #
 # Clean project target.
