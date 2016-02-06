@@ -1,5 +1,5 @@
-#ifndef LIBN64_RDRAM_H
-#define LIBN64_RDRAM_H
+#ifndef LIBN64_RCP_RI_H
+#define LIBN64_RCP_RI_H
 
 #include <mmio.h>
 

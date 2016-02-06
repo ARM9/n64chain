@@ -1,5 +1,5 @@
-#ifndef LIBN64_RDP_H
-#define LIBN64_RDP_H
+#ifndef LIBN64_RCP_RDP_H
+#define LIBN64_RCP_RDP_H
 
 #include <bitfield.h>
 #include <mmio.h>

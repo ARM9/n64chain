@@ -1,5 +1,5 @@
-#ifndef LIBN64_SI_H
-#define LIBN64_SI_H
+#ifndef LIBN64_RCP_SI_H
+#define LIBN64_RCP_SI_H
 
 #include <mmio.h>
 
