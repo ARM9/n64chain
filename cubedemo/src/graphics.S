@@ -8,6 +8,12 @@
 # 'LICENSE', which is part of this source code package.
 #
 
+#include "vr4300/cp0.h"
+#include "rcp/mi.h"
+#include "rcp/vi.h"
+
+#define MI_INTR_VI 0x08
+
 .file "src/graphics.S"
 .section .rodata
 .align 3
@@ -20,38 +26,78 @@ rsp_ucode:
 .size rsp_ucode,.-rsp_ucode
 
 #
-# Invoked on a VI interrupt.
+# Invoked on interrupt.
 #
 .text
+.set noreorder
 .global __interrupt_handler
 .type __interrupt_handler, @function
 __interrupt_handler:
 
+  # TODO Preserve registers
+
+  mfc0 $k0, COP0_CAUSE
+  andi $k1, $k0, COP0_CAUSE_EXCEPTION
+  beqz $k1, __interrupt_handler_maybe_pre_nmi_interrupt
+  nop
+
+  # TODO Critical Exception Failure
+  nop
+
+__interrupt_handler_maybe_pre_nmi_interrupt:
+  andi $k1, $k0, COP0_CAUSE_PRENMI
+  beqz $k1, __interrupt_handler_maybe_count_interrupt
+  nop
+
+  # TODO Pre-Reset Interrupt Handler
+  nop
+
+__interrupt_handler_maybe_count_interrupt:
+  andi $k1, $k0, COP0_CAUSE_TIMER
+  beqzl $k1, __interrupt_handler_maybe_vi_interrupt
+  mtc0 $0, COP0_COMPARE
+
+  # TODO Timer Interrupt Handler
+  nop
+
+__interrupt_handler_maybe_vi_interrupt:
+  # Determine interrupt reason.
+  #
+  # If MI status VI interrupt bit is set, swap the framebuffer.
+  # If MI status VI interrupt bit is not set, just clear the exception.
+  li $k0, MI_BASE
+  lw $k1, MI_INTR($k0)
+  andi $k1, $k1, MI_INTR_VI
+  beqz $k1, __interrupt_handler_finish
+  nop
+
+__interrupt_handler_determine_framebuffer:
   # Set VI origin to the second frame.
   #
   # If VI_ORIGIN_REG is 0x0010 0000, set it to 0x0020 0000.
   # If VI_ORIGIN_REG is 0x0020 0000, set it to 0x0010 0000.
-  lui $k0, 0xA440
-  lw $k1, 0x0004($k0)
+  li $k0, VI_BASE
+  lw $k1, VI_ORIGIN($k0)
   srl $k1, $k1, 0x15
 
-.set noreorder
-  beql $k1, $0, __interrupt_handler_continue
+  beql $k1, $0, __interrupt_handler_set_framebuffer
   ori $k1, $0, 0x2
-.set reorder
 
-__interrupt_handler_continue:
+__interrupt_handler_set_framebuffer:
   sll $k1, $k1, 0x14
-  sw $k1, 0x0004($k0)
+  sw $k1, VI_ORIGIN($k0)
 
   # Clear the pending VI interrupt.
-  sw $0, 0x0010($k0)
+  sw $0, VI_V_CURRENT_LINE($k0)
 
+__interrupt_handler_finish:
   # Clear exception level and return.
-  mfc0 $k0, $12
-  xor $k0, $k0, 0x2
-  mtc0 $k0, $12
+  mfc0 $k0, COP0_STATUS
+  xor $k0, $k0, COP0_STATUS_EXCEPTION
+  mtc0 $k0, COP0_STATUS
   eret
+
+.set reorder
 
 .size __interrupt_handler,.-__interrupt_handler
 
