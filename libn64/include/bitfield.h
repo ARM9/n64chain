@@ -3,14 +3,19 @@
 
 /* use ifdefs to fix C/asm incompatibilities with 64 bit ints */
 #ifdef __LANGUAGE_ASSEMBLY
+/* Create a bit mask with low n bits set
+ *  n = Number of least significant bits set in mask 
+ */
+#   define _SetLowBits(n) ((1<<(n))-1)
+#else
+#   define _SetLowBits(n) ((1ULL<<(n))-1)
+#endif
+
 /* Mask n lowest bits in x.
  *  x = Value to mask
  *  n = Number of least significant bits set in mask 
  */
-#   define _Mask(x,n) ((x)&((1<<(n))-1))
-#else
-#   define _Mask(x,n) ((x)&((1ULL<<(n))-1))
-#endif
+#define _Mask(x,n) ((x)&_SetLowBits(n))
 
 /* set "bit field" hb:lb
  *  v = Value to write
@@ -31,7 +36,7 @@
  *  is ORed in.
  */
 #define WriteBits(x,v,hb,lb) \
-    ((x) & (~(((1ULL<< ((hb)-(lb)+1) )-1) <<(lb)))) \
+    ((x) & ~((_SetLowBits((hb)-(lb)+1))<<(lb))) \
     | SetField(v,hb,lb)
 
 /* Read bit field x[hb:lb]
@@ -39,7 +44,7 @@
  *  hb = High bit of bit field (inclusive)
  *  lb = Low bit of bit field (inclusive)
  */
-#define ReadBits(x,hb,lb) (((x)&(((1ULL<< ((hb)-(lb)+1) )-1)<<(lb))) >> (lb))
+#define ReadBits(x,hb,lb) (((x)&(_SetLowBits((hb)-(lb)+1)<<(lb))) >> (lb))
 #endif
 
 #endif

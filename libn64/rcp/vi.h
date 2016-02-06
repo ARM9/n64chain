@@ -30,21 +30,19 @@
 #define VI_X_SCALE  IO_32(VI_BASE,0x30) // $04400030..$04400033 VI: X-Scale Register
 #define VI_Y_SCALE  IO_32(VI_BASE,0x34) // $04400034..$04400037 VI: Y-Scale Register
 
-
 #define VI_BPP0     0x0000 // VI Status/Control: Color Depth Blank (No Data Or Sync) (Bit 0..1)
 #define VI_BPP16    0x0002 // VI Status/Control: Color Depth 16BPP R5/G5/B5/A1 (Bit 0..1)
 #define VI_BPP32    0x0003 // VI Status/Control: Color Depth 32BPP R8/G8/B8/A8 (Bit 0..1)
-
 #define GAMMA_DITHER_EN 0x00004 // VI Status/Control: Gamma Dither Enable (Requires: Gamma Enable) (Bit 2)
-#define GAMMA_EN 0x00008    // VI Status/Control: Gamma Enable (Gamma Boost For YUV Images) (Bit 3)
-#define DIVOT_EN 0x00010    // VI Status/Control: Divot Enable (Used With Anti-alias) (Bit 4)
+#define GAMMA_EN    0x00008    // VI Status/Control: Gamma Enable (Gamma Boost For YUV Images) (Bit 3)
+#define DIVOT_EN    0x00010    // VI Status/Control: Divot Enable (Used With Anti-alias) (Bit 4)
 #define VBUS_CLK_EN 0x00020 // VI Status/Control: Video Bus Clock Enable (Bit 5)
-#define INTERLACE 0x00040   // VI Status/Control: Interlace/Serrate (Used With Interlaced Display) (Bit 6)
-#define TST_MODE 0x00080    // VI Status/Control: Test Mode (Bit 7)
-#define AA_MODE_0 0x00000   // VI Status/Control: AA Mode 0 = Anti­-alias & Resample (Always Fetch Extra Lines) (Bit 8..9)
-#define AA_MODE_1 0x00100   // VI Status/Control: AA Mode 1 = Anti­-alias & Resample (Fetch Extra Lines When Needed) (Bit 8..9)
-#define AA_MODE_2 0x00200   // VI Status/Control: AA Mode 2 = Resample Only (Bit 8..9)
-#define AA_MODE_3 0x00300   // VI Status/Control: AA Mode 3 = Replicate Pixels & No Interpolation (Bit 8..9)
+#define INTERLACE   0x00040   // VI Status/Control: Interlace/Serrate (Used With Interlaced Display) (Bit 6)
+#define TST_MODE    0x00080    // VI Status/Control: Test Mode (Bit 7)
+#define AA_MODE_0   0x00000   // VI Status/Control: AA Mode 0 = Anti­-alias & Resample (Always Fetch Extra Lines) (Bit 8..9)
+#define AA_MODE_1   0x00100   // VI Status/Control: AA Mode 1 = Anti­-alias & Resample (Fetch Extra Lines When Needed) (Bit 8..9)
+#define AA_MODE_2   0x00200   // VI Status/Control: AA Mode 2 = Resample Only (Bit 8..9)
+#define AA_MODE_3   0x00300   // VI Status/Control: AA Mode 3 = Replicate Pixels & No Interpolation (Bit 8..9)
 #define DIAG_0      0x00400 // VI Status/Control: Diagnotic 0 (Bit 10..11)
 #define DIAG_1      0x00800 // VI Status/Control: Diagnotic 1 (Bit 10..11)
 #define PIXEL_ADV_0 0x00000 // VI Status/Control: Pixel Advance 0 (Bit 12..15)

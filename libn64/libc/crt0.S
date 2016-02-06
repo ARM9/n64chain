@@ -15,37 +15,37 @@
 
 .align 5
 .global __ipl_handoff
-.type	__ipl_handoff, @function
+.type   __ipl_handoff, @function
 __ipl_handoff:
 
 .set noat
 .set noreorder
 
-	# Prevent the PIF from resetting the console.
-	addiu $a0, $zero, 8
-	lui $at, 0xBFC0
-	sw $a0, 0x7FC($at)
+    # Prevent the PIF from resetting the console.
+    addiu $a0, $zero, 8
+    lui $at, 0xBFC0
+    sw $a0, 0x7FC($at)
 
-	# Setup a stack at the top of cached RAM.
-	lui $at, 0x8000
-	lw $at, 0x318($at)
-	lui $sp, 0x8000
-	daddu $sp, $sp, $at
+    # Setup a stack at the top of cached RAM.
+    lui $at, 0x8000
+    lw $at, 0x318($at)
+    lui $sp, 0x8000
+    daddu $sp, $sp, $at
 
-	# Set the global pointer reference value.
-	la $gp, _gp
+    # Set the global pointer reference value.
+    la $gp, _gp
 
     # Set CP0/1 usable, disable interrupts
     # and enable 64-bit modes for k/s/u.
-	lui $v0, 0x3000
-	ori $v0, $v0, 0x04E0
-	mtc0 $v0, $12
+    lui $v0, 0x3000
+    ori $v0, $v0, 0x04E0
+    mtc0 $v0, $12
 
     jal __init_sections
     nop
     # Clear out cause bits and jump to main.
     jal main
-	mtc0 $zero, $13
+    mtc0 $zero, $13
 
     # We shouldn't get here, but just in case...
 __ipl_handoff_spin:

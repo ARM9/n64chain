@@ -1,6 +1,9 @@
 #ifndef LIBN64_MMIO_H
 #define LIBN64_MMIO_H
 
+#define KSEG0(x)    (0x80000000|(x)) // Cached
+#define KSEG1(x)    (0xA0000000|(x)) // Uncached
+
 /* IO abstraction (C and asm compatible)
  * IO_X(base,offset) returns a volatile pointer in C, just the offset in asm
  */
