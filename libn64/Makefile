@@ -37,6 +37,7 @@ CFILES := $(call FIXPATH,\
 	libc/stdlib.c \
 	rcp/pi.c \
 	rcp/rdp.c \
+	vr4300/cache.c \
 )
 
 OBJFILES := \

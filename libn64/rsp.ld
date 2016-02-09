@@ -1,5 +1,5 @@
 /*
- * ld script for RSP.
+ * Linker script for RSP.
  */
 
 OUTPUT_FORMAT("elf32-bigmips")
