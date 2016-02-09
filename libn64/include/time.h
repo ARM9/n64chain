@@ -11,7 +11,7 @@
 #ifndef LIBN64_TIME_H
 #define LIBN64_TIME_H
 
-#include "vr4300/cp0.h"
+#include <vr4300/cp0.h>
 
 typedef long time_t;
 typedef unsigned long clock_t;
@@ -31,8 +31,9 @@ struct timeval {
 static inline clock_t clock(void) {
     clock_t count;
     __asm__ __volatile__(
-        "mfc0 %0, "COP0_COUNT
-        :"=r" (count)::);
+        "mfc0 %0, " CP0_COUNT "\n\t"
+        : "=r" (count)
+    );
     return count;
 }
 

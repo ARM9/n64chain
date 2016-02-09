@@ -1,3 +1,6 @@
+//
+// libn64/rcp/pi.h: Peripheral interface.
+//
 #ifndef LIBN64_RCP_PI_H
 #define LIBN64_RCP_PI_H
 

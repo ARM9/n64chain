@@ -1,5 +1,5 @@
 //
-// libn64/rcp/mi.h: MI helper functions.
+// libn64/rcp/mi.h: MIPS interface helper functions.
 //
 // n64chain: A (free) open-source N64 development toolchain.
 // Copyright 2014-15 Tyler J. Stachecki <tstache1@binghamton.edu>

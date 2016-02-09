@@ -36,8 +36,8 @@ __interrupt_handler:
 
   # TODO Preserve registers
 
-  mfc0 $k0, COP0_CAUSE
-  andi $k1, $k0, COP0_CAUSE_EXCEPTION
+  mfc0 $k0, CP0_CAUSE
+  andi $k1, $k0, CP0_CAUSE_EXCEPTION
   beqz $k1, __interrupt_handler_maybe_pre_nmi_interrupt
   nop
 
@@ -45,7 +45,7 @@ __interrupt_handler:
   nop
 
 __interrupt_handler_maybe_pre_nmi_interrupt:
-  andi $k1, $k0, COP0_CAUSE_PRENMI
+  andi $k1, $k0, CP0_CAUSE_PRENMI
   beqz $k1, __interrupt_handler_maybe_count_interrupt
   nop
 
@@ -53,9 +53,9 @@ __interrupt_handler_maybe_pre_nmi_interrupt:
   nop
 
 __interrupt_handler_maybe_count_interrupt:
-  andi $k1, $k0, COP0_CAUSE_TIMER
+  andi $k1, $k0, CP0_CAUSE_TIMER
   beqzl $k1, __interrupt_handler_maybe_vi_interrupt
-  mtc0 $0, COP0_COMPARE
+  mtc0 $0, CP0_COMPARE
 
   # TODO Timer Interrupt Handler
   nop
@@ -92,9 +92,9 @@ __interrupt_handler_set_framebuffer:
 
 __interrupt_handler_finish:
   # Clear exception level and return.
-  mfc0 $k0, COP0_STATUS
-  xor $k0, $k0, COP0_STATUS_EXCEPTION
-  mtc0 $k0, COP0_STATUS
+  mfc0 $k0, CP0_STATUS
+  xor $k0, $k0, CP0_STATUS_EXCEPTION
+  mtc0 $k0, CP0_STATUS
   eret
 
 .set reorder

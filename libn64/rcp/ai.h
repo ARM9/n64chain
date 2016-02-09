@@ -1,3 +1,6 @@
+//
+// libn64/rcp/ai.h: Audio interface.
+//
 #ifndef LIBN64_RCP_AI_H
 #define LIBN64_RCP_AI_H
 

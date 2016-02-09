@@ -1,3 +1,6 @@
+//
+// libn64/rcp/si.h: Serial interface.
+//
 #ifndef LIBN64_RCP_SI_H
 #define LIBN64_RCP_SI_H
 

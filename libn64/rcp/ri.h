@@ -1,9 +1,15 @@
+//
+// libn64/rcp/ri.h: RDRAM interface.
+//
 #ifndef LIBN64_RCP_RI_H
 #define LIBN64_RCP_RI_H
 
 #include <mmio.h>
-
-#define RDRAM   0x00000000 // $00000000..$003FFFFF RDRAM Memory 4MB ($00000000..$007FFFFF 8MB With Expansion Pak)
+// $00000000..$003FFFFF RDRAM Memory 4MB
+#define RDRAM           0x00000000
+#define RDRAM_SIZE      0x400000
+// $00000000..$007FFFFF 8MB With Expansion Pak
+#define RDRAM_EXP_SIZE  0x800000
 
 #define RDRAM_BASE  0xA3F00000 // $03F00000..$03F00027 RDRAM Base Register
 #define RDRAM_DEVICE_TYPE   IO_32(RDRAM_BASE,0x00 // $03F00000..$03F00003 RDRAM: Device Type Register

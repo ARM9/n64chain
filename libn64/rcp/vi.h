@@ -1,5 +1,5 @@
 //
-// libn64/rcp/vi.h: VI helper functions.
+// libn64/rcp/vi.h: Video interface helper functions.
 //
 // n64chain: A (free) open-source N64 development toolchain.
 // Copyright 2014-15 Tyler J. Stachecki <tstache1@binghamton.edu>

@@ -1,3 +1,6 @@
+//
+// libn64/rcp/rdp.h: RDP macros and functions.
+//
 #ifndef LIBN64_RCP_RDP_H
 #define LIBN64_RCP_RDP_H
 
@@ -167,6 +170,7 @@
 
 #define texture_rectangle_flip()
 
+// TODO flags could be organized a bit better...
 /* Flags lifted from PeterLemon/N64 */
 #define ALPHA_COMPARE_EN 0x00000000000001 // Set_Other_Modes A: Conditional Color Write On Alpha Compare (Bit 0)
 #define DITHER_ALPHA_EN 0x00000000000002  // Set_Other_Modes B: Use Random Noise In Alpha Compare, Otherwise Use Blend Alpha In Alpha Compare (Bit 1)
