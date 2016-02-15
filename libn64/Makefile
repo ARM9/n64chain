@@ -35,8 +35,10 @@ CFILES := $(call FIXPATH,\
 	libc/math.c \
 	libc/time.c \
 	libc/stdlib.c \
+	libc/string.c \
 	rcp/pi.c \
 	rcp/rdp.c \
+	rcp/vi.c \
 	vr4300/cache.c \
 )
 

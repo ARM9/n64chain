@@ -34,17 +34,17 @@
 #define VI_BPP16    0x0002 // VI Status/Control: Color Depth 16BPP R5/G5/B5/A1 (Bit 0..1)
 #define VI_BPP32    0x0003 // VI Status/Control: Color Depth 32BPP R8/G8/B8/A8 (Bit 0..1)
 #define GAMMA_DITHER_EN 0x00004 // VI Status/Control: Gamma Dither Enable (Requires: Gamma Enable) (Bit 2)
-#define GAMMA_EN    0x00008    // VI Status/Control: Gamma Enable (Gamma Boost For YUV Images) (Bit 3)
-#define DIVOT_EN    0x00010    // VI Status/Control: Divot Enable (Used With Anti-alias) (Bit 4)
+#define GAMMA_EN    0x00008 // VI Status/Control: Gamma Enable (Gamma Boost For YUV Images) (Bit 3)
+#define DIVOT_EN    0x00010 // VI Status/Control: Divot Enable (Used With Anti-alias) (Bit 4)
 #define VBUS_CLK_EN 0x00020 // VI Status/Control: Video Bus Clock Enable (Bit 5)
-#define INTERLACE   0x00040   // VI Status/Control: Interlace/Serrate (Used With Interlaced Display) (Bit 6)
-#define TST_MODE    0x00080    // VI Status/Control: Test Mode (Bit 7)
-#define AA_MODE_0   0x00000   // VI Status/Control: AA Mode 0 = Anti­-alias & Resample (Always Fetch Extra Lines) (Bit 8..9)
-#define AA_MODE_1   0x00100   // VI Status/Control: AA Mode 1 = Anti­-alias & Resample (Fetch Extra Lines When Needed) (Bit 8..9)
-#define AA_MODE_2   0x00200   // VI Status/Control: AA Mode 2 = Resample Only (Bit 8..9)
-#define AA_MODE_3   0x00300   // VI Status/Control: AA Mode 3 = Replicate Pixels & No Interpolation (Bit 8..9)
-#define DIAG_0      0x00400 // VI Status/Control: Diagnotic 0 (Bit 10..11)
-#define DIAG_1      0x00800 // VI Status/Control: Diagnotic 1 (Bit 10..11)
+#define INTERLACE   0x00040 // VI Status/Control: Interlace/Serrate (Used With Interlaced Display) (Bit 6)
+#define TST_MODE    0x00080 // VI Status/Control: Test Mode (Bit 7)
+#define AA_MODE_0   0x00000 // VI Status/Control: AA Mode 0 = Anti­-alias & Resample (Always Fetch Extra Lines) (Bit 8..9)
+#define AA_MODE_1   0x00100 // VI Status/Control: AA Mode 1 = Anti­-alias & Resample (Fetch Extra Lines When Needed) (Bit 8..9)
+#define AA_MODE_2   0x00200 // VI Status/Control: AA Mode 2 = Resample Only (Bit 8..9)
+#define AA_MODE_3   0x00300 // VI Status/Control: AA Mode 3 = Replicate Pixels & No Interpolation (Bit 8..9)
+#define DIAG_0      0x00400 // VI Status/Control: Diagnostic 0 (Bit 10..11)
+#define DIAG_1      0x00800 // VI Status/Control: Diagnostic 1 (Bit 10..11)
 #define PIXEL_ADV_0 0x00000 // VI Status/Control: Pixel Advance 0 (Bit 12..15)
 #define PIXEL_ADV_1 0x01000 // VI Status/Control: Pixel Advance 1 (Bit 12..15)
 #define PIXEL_ADV_2 0x02000 // VI Status/Control: Pixel Advance 2 (Bit 12..15)
@@ -72,20 +72,20 @@
 #include <stdint.h>
 
 typedef struct vi_state_t {
-	uint32_t status;
-	uint32_t origin;
-	uint32_t width;
-	uint32_t intr;
-	uint32_t current;
-	uint32_t burst;
-	uint32_t v_sync;
-	uint32_t h_sync;
-	uint32_t leap;
-	uint32_t h_start;
-	uint32_t v_start;
-	uint32_t v_burst;
-	uint32_t x_scale;
-	uint32_t y_scale;
+	uint32_t status;   // Status and control register
+	uint32_t origin;   // Pointer to uncached buffer in memory to rasterize
+	uint32_t width;    // Width of the buffer in pixels
+	uint32_t intr;     // Vertical interrupt control register
+	uint32_t current;  // Current vertical line counter
+	uint32_t burst;    // Timing generation register for PAL/NTSC
+	uint32_t v_sync;   // Number of lines per frame
+	uint32_t h_sync;   // Number of pixels in the line
+	uint32_t leap;     // Leap pattern (used by PAL)
+	uint32_t h_start;  // Beginning of video horizontally
+	uint32_t v_start;  // Beginning of video vertically
+	uint32_t v_burst;  // Beginning of color burst in vertical lines
+	uint32_t x_scale;  // Horizontal scaling factor from buffer to screen
+	uint32_t y_scale;  // Vertical scaling factor from buffer to screen
 } vi_state_t __attribute__ ((aligned (8)));
 
 //
@@ -117,6 +117,25 @@ static inline void vi_flush_state(const vi_state_t *state) {
     : "0" (state), "3" (vi_region)
   );
 }
+
+//
+// Pre-defined video modes for NTSC, PAL, and MPAL
+//
+typedef enum
+{
+    VI_RES_320x240,
+    VI_RES_640x480,
+    VI_RES_256x240,
+    VI_RES_512x480
+} vi_resolution_t;
+
+//
+// Sets the register data for a given resolution
+//
+// Will select the appropriate settings based on detected TV mode
+//
+void vi_setup_res(vi_resolution_t res, vi_state_t *out);
+
 #endif
 
 #endif

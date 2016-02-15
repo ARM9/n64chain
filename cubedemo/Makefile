@@ -77,8 +77,9 @@ $(ROM_NAME).elf: $(LIBN64) $(OBJFILES)
 	@$(CC) $(CFLAGS) $(OPTFLAGS) -nostdlib \
 		-Wl,-Map=$(ROM_NAME).map \
 		-T$(LDSCRIPT) \
-		-L$(LIBN64DIR) -ln64 \
-		-o $@ $(OBJFILES)
+		-L$(LIBN64DIR) \
+		-o $@ $(OBJFILES) \
+		-ln64
 
 $(LIBN64):
 	@$(MAKE) -sC $(LIBN64DIR)
