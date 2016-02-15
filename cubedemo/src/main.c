@@ -9,11 +9,13 @@
 //
 
 #include "src/graphics.h"
+
+#include <stddef.h>
+#include <stdint.h>
+
 #include <rcp/mi.h>
 #include <rcp/rsp.h>
 #include <rcp/vi.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <vr4300/cp0.h>
 
 //
@@ -24,27 +26,6 @@
 // Bank 3: 0x0020 0000 -> 0x002F FFFF ( FRAMEBUFFER B )
 // Bank 4: 0x0030 0000 -> 0x003F FFFF (STACK/MISC DATA)
 //
-
-//
-// These pre-defined values are suitable for NTSC.
-// TODO: Add support for PAL and PAL-M televisions.
-//
-static vi_state_t vi_state = {
-	0x0000324E, // status
-	0x00100000, // origin
-	0x00000140, // width
-	0x00000002, // intr
-	0x00000000, // current
-	0x03E52239, // burst
-	0x0000020D, // v_sync
-	0x00000C15, // h_sync
-	0x0C150C15, // leap
-	0x006C02EC, // h_start
-	0x002501FF, // v_start
-	0x000E0204, // v_burst
-	0x00000200, // x_scale
-	0x00000400, // y_scale
-};
 
 // Application entry point.
 int main() {
@@ -77,6 +58,11 @@ int main() {
 
   rsp_issue_dma_to_rsp(ucode_addr + 0x1000, 0x1000, 0x1000 - 0x1);
   while (rsp_is_dma_pending());
+
+  vi_state_t vi_state;
+  vi_setup_res(VI_RES_320x240, &vi_state);
+  vi_state.status |= (VI_BPP16 | GAMMA_DITHER_EN | GAMMA_EN | INTERLACE | AA_MODE_2);
+  vi_state.origin = 0x00100000;
 
   // Enable the VI.
   vi_flush_state(&vi_state);
