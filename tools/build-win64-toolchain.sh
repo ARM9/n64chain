@@ -11,9 +11,9 @@ set -e
 # 'LICENSE', which is part of this source code package.
 #
 
-BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.25.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-5.2.0/gcc-5.2.0.tar.bz2"
-GMP="ftp://ftp.gnu.org/gnu/gmp/gmp-6.0.0a.tar.bz2"
+BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.26.tar.bz2"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-5.3.0/gcc-5.3.0.tar.bz2"
+GMP="ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.0.tar.bz2"
 MAKE="ftp://ftp.gnu.org/gnu/make/make-4.1.tar.bz2"
 MPC="ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz"
 MPFR="ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.1.3.tar.bz2"
@@ -122,7 +122,7 @@ if [ ! -f stamps/gcc-configure ]; then
     --host=x86_64-w64-mingw32 \
     --prefix="${SCRIPT_DIR}" \
     --target=mips64-elf --with-arch=vr4300 \
-    --enable-languages=c --without-headers --with-newlib \
+    --enable-languages=c,c++ --without-headers --with-newlib \
     --with-gnu-as=${SCRIPT_DIR}/bin/mips64-elf-as.exe \
     --with-gnu-ld=${SCRIPT_DIR}/bin/mips64-elf-ld.exe \
     --enable-checking=release \
@@ -137,6 +137,8 @@ if [ ! -f stamps/gcc-configure ]; then
     --disable-libssp \
     --disable-libunwind-exceptions \
     --disable-libvtv \
+    --disable-libstdcxx-pch \
+    --disable-libstdcxx-threads \
     --disable-multilib \
     --disable-nls \
     --disable-shared \

@@ -11,8 +11,8 @@ set -eu
 # 'LICENSE', which is part of this source code package.
 #
 
-BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.25.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-5.2.0/gcc-5.2.0.tar.bz2"
+BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.26.tar.bz2"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-5.3.0/gcc-5.3.0.tar.bz2"
 MAKE="ftp://ftp.gnu.org/gnu/make/make-4.1.tar.bz2"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -90,7 +90,7 @@ if [ ! -f stamps/gcc-configure ]; then
   ../gcc-source/configure \
     --prefix="${SCRIPT_DIR}" \
     --target=mips64-elf --with-arch=vr4300 \
-    --enable-languages=c --without-headers --with-newlib \
+    --enable-languages=c,c++ --without-headers --with-newlib \
     --with-gnu-as=${SCRIPT_DIR}/bin/mips64-elf-as \
     --with-gnu-ld=${SCRIPT_DIR}/bin/mips64-elf-ld \
     --enable-checking=release \
@@ -105,6 +105,8 @@ if [ ! -f stamps/gcc-configure ]; then
     --disable-libssp \
     --disable-libunwind-exceptions \
     --disable-libvtv \
+    --disable-libstdcxx-pch \
+    --disable-libstdcxx-threads \
     --disable-multilib \
     --disable-nls \
     --disable-shared \
