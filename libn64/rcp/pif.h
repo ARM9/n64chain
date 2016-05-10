@@ -1,5 +1,5 @@
 //
-// libn64/TODO/pif.h: duno
+// libn64/TODO/pif.h: Peripheral interface
 //
 #ifndef LIBN64_PIF_H
 #define LIBN64_PIF_H

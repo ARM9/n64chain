@@ -34,6 +34,11 @@
 #ifndef __LANGUAGE_ASSEMBLY
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //
 // Sets the MI_INTR_MASK_REG bits.
 //
@@ -42,6 +47,11 @@
 static inline void mi_set_intr_mask(uint32_t mask) {
   *MI_INTR_MASK = mask;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 #endif

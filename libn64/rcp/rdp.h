@@ -140,8 +140,11 @@
 #define no_op       0x0000000000000000
 
 /* Triangle coefficient commands */
-#define edge_coefficients(xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf) \
-    SetField(xl,63,48)|SetField(xlf,47,32)|SetField(dxldy,31,16) \
+#define edge_coefficients(command,mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf, xh,xhf,dxhdy,dxhdyf, xm,xmf,dxmdy,dxmdyf) \
+    SetField(command,61,56) \
+    | SetField(mf,55,55)|SetField(miplvl,53,51)|SetField(tile,50,48) \
+    | SetField(yl,45,32)|SetField(ym,29,16)|SetField(yh,13,0) \
+    , SetField(xl,63,48)|SetField(xlf,47,32)|SetField(dxldy,31,16) \
     | SetField(dxldyf,15,0) \
     , SetField(xh,63,48)|SetField(xhf,47,32)|SetField(dxhdy,31,16) \
     | SetField(dxhdyf,15,0) \
@@ -154,21 +157,29 @@
 #define zbuffer_coefficients()
 
 /* Triangle raster commands */
-#define fill_triangle(mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf) 0x0800000000000000 \
-    | SetField(mf,55,55)|SetField(miplvl,53,51)|SetField(tile,50,48) \
-    | SetField(yl,45,32)|SetField(ym,29,16)|SetField(yh,13,0) \
-    , edge_coefficients(xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf)
+#define fill_triangle(mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf) \
+    edge_coefficients(0x08,mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf, xh,xhf,dxhdy,dxhdyf, xm,xmf,dxmdy,dxmdyf)
+
+#define LEFT_MAJOR  0
+#define RIGHT_MAJOR 1
 
 #define fill_rectangle(x0, y0, x1, y1) 0x3600000000000000 \
     | SetField(x1,55,44)|SetField(y1,43,32) \
     | SetField(x0,23,12)|SetField(y0,11,0)
 
 // TODO WARNING mixed info on this
-#define texture_rectangle(x0) 0x2400000000000000 \
-    | SetField(x0,55,44) \
-    , ()
+#define texture_rectangle(xh,yh,tile,xl,yl,s,t,dsdx,dtdy) 0x2400000000000000 \
+    | SetField(xh,55,44)|SetField(yh,43,32)|SetField(tile,26,24) \
+    | SetField(xl,23,12)|SetField(yl,11,0) \
+    , SetField(s,63,48)|SetField(t,47,32) \
+    | SetField(dsdx,31,16)|SetField(dtdy,15,0)
 
-#define texture_rectangle_flip()
+#define texture_rectangle_flip(xh,yh,tile,xl,yl,s,t,dsdx,dtdy) \
+    0x2500000000000000 \
+    | SetField(xh,55,44)|SetField(yh,43,32)|SetField(tile,26,24) \
+    | SetField(xl,23,12)|SetField(yl,11,0) \
+    , SetField(s,63,48)|SetField(t,47,32) \
+    | SetField(dsdx,31,16)|SetField(dtdy,15,0)
 
 // TODO flags could be organized a bit better...
 /* Flags lifted from PeterLemon/N64 */
@@ -328,9 +339,17 @@
 #ifndef __LANGUAGE_ASSEMBLY
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint64_t rdp_cmd;
 
 void run_dpc(const void *list, uint32_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

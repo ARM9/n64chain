@@ -60,6 +60,11 @@
 #ifndef __LANGUAGE_ASSEMBLY
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //
 // Issues a DMA to the RSP.
 //
@@ -103,6 +108,11 @@ static inline void rsp_set_pc(uint32_t pc) {
 static inline void rsp_set_status(uint32_t mask) {
   *RSP_STATUS = mask;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 #endif

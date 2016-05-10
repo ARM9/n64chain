@@ -15,46 +15,51 @@ MEMORY {
 
 SECTIONS {
     . = ORIGIN(iram);
+
     __text_start = .;
-    .text (ALIGN(4)) : {
+    .text : {
         *(.text)
         *(.text.*)
-        . = 0x1000;
-        __text_end = .;
+        /* limits size to 0x1000 but also pads to 0x1000 */
+        /*. = 0x1000;*/
     } > iram
-    . = ALIGN(16);
+    __text_end = .;
+    
+    __iram_lma_start = LOADADDR (.text);
+    __iram_lma_end = LOADADDR (.text) + SIZEOF (.text);
+
+    /* no rodata since there's no read only memory */
+    /DISCARD/ : { *(.rodata .rodata.* .rdata .rdata.*) }
 
     . = ORIGIN(dram);
+
     __data_start = .;
-    .data : {
+    .data : AT (ADDR (.text) + SIZEOF (.text)) {
         *(.data)
         *(.data.*)
     } > dram
-    .sdata : {
+    .sdata : AT (ADDR (.data) + SIZEOF (.data)) {
         *(.sdata)
         *(.sdata.*)
-    } > dram
-    .lit8 : {
-        *(.lit8)
-    } > dram
-    .lit4 : {
-        *(.lit4)
     } > dram
     __data_end = .;
 
     __bss_start = .;
-    .sbss : {
+    .sbss NOLOAD : {
         *(.sbss .sbss.*)
         *(.scommon)
     } > dram
-    .bss : {
+    .bss NOLOAD : {
         *(.bss .bss.*)
         *(COMMON)
     } > dram
     . = ALIGN(16);
     __bss_end = .;
 
-    _end = .;
+    __dram_lma_start = LOADADDR (.data);
+    __dram_lma_end = LOADADDR (.data) + __data_end - __data_start;
+
+    ucode_end = __dram_lma_end;
 
     /DISCARD/ : { *(.MIPS.abiflags) }
 }

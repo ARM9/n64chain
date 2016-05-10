@@ -37,8 +37,8 @@ __ipl_handoff:
 
     # Set CP0/1 usable, disable interrupts
     # and enable 64-bit modes for k/s/u.
-    lui $v0, 0x3000
-    ori $v0, $v0, 0x04E0
+    li $v0, (1<<29 | 1<<28 | 1<<26) | 0x000004E0
+    #        cop1    cop0    fr
     mtc0 $v0, $12
 
     jal __init_sections

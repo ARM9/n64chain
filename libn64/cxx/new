@@ -1,0 +1,19 @@
+#ifndef LIBN64_CXX_NEW_H
+#define LIBN64_CXX_NEW_H
+
+#include <stddef.h>
+
+/* Placement new */
+void *operator new(size_t, void *p) {
+    return p;
+}
+
+void *operator new[](size_t, void *p) {
+    return p;
+}
+
+void operator delete(void *, void *) {}
+void operator delete[](void *, void *) {}
+
+#endif
+// vim:ft=cpp

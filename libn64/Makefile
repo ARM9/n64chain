@@ -19,11 +19,14 @@ endif
 SDK_DIR := $(call FIXPATH,$(CURDIR)/../tools)
 N64_GCC_PREFIX := $(call FIXPATH,$(SDK_DIR)/bin/mips64-elf-)
 
-AS := $(N64_GCC_PREFIX)as
-AR := $(N64_GCC_PREFIX)ar
-CC := $(N64_GCC_PREFIX)gcc
+AS  := $(N64_GCC_PREFIX)as
+AR  := $(N64_GCC_PREFIX)ar
+CC  := $(N64_GCC_PREFIX)gcc
+CXX := $(N64_GCC_PREFIX)g++
 
-CFLAGS := -Wall -Wextra -pedantic -std=c99 -fno-builtin -nostdinc -I. -Iinclude
+CFLAGS   := -Wall -Wextra -pedantic -fno-builtin -nostdinc -I. -Iinclude
+CXXFLAGS := $(CFLAGS) -std=c++11 -fno-rtti -fno-exceptions
+CFLAGS   += -std=c99
 OPTFLAGS := -Os -march=vr4300 -flto -ffat-lto-objects \
 	-mgpopt -G8 -mno-extern-sdata
 
@@ -42,9 +45,15 @@ CFILES := $(call FIXPATH,\
 	vr4300/cache.c \
 )
 
+CXXFILES := $(call FIXPATH,\
+	cxx/cxxabi.cpp \
+	cxx/alloc.cpp \
+)
+
 OBJFILES := \
 	$(ASMFILES:.S=.o) \
-	$(CFILES:.c=.o)
+	$(CFILES:.c=.o) \
+	$(CXXFILES:.cpp=.o)
 
 DEPFILES := $(OBJFILES:.o=.d)
 
@@ -66,6 +75,9 @@ libn64.a: $(OBJFILES)
 	@echo $(call FIXPATH,"Compiling: libn64/$<")
 	@$(CC) $(CFLAGS) $(OPTFLAGS) -MMD -c $< -o $@
 
+%.o: %.cpp
+	@echo $(call FIXPATH,"Compiling: libn64/$<")
+	@$(CXX) $(CXXFLAGS) $(OPTFLAGS) -MMD -c $< -o $@
 #
 # Clean project target.
 #
