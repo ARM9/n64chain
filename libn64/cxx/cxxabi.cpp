@@ -7,7 +7,7 @@ extern "C" {
 void __cxa_pure_virtual() {
     volatile int sp;
     char m[] = "Error: __cxa_pure_virtual";
-    char *p = (char*)&sp;
+    char *p = (char*)&sp - sizeof(m);
     for(unsigned i = 0; i < sizeof(m); i++)
         *p++ = m[i];
     while(1);

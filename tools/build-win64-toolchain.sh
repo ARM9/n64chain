@@ -12,7 +12,7 @@ set -e
 #
 
 BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.26.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-5.3.0/gcc-5.3.0.tar.bz2"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-6.1.0/gcc-6.1.0.tar.bz2"
 GMP="ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.0.tar.bz2"
 MAKE="ftp://ftp.gnu.org/gnu/make/make-4.1.tar.bz2"
 MPC="ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz"
@@ -21,7 +21,7 @@ MPFR="ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.1.3.tar.bz2"
 export PATH="${PATH}:${SCRIPT_DIR}/bin"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
+cd "${SCRIPT_DIR}" && mkdir -p {stamps,tarballs}
 
 if [ ! -f stamps/binutils-download ]; then
   wget "${BINUTILS}" -O "tarballs/$(basename ${BINUTILS})"
@@ -30,7 +30,7 @@ fi
 
 if [ ! -f stamps/binutils-extract ]; then
   mkdir -p binutils-{build,source}
-  tar -xf tarballs/$(basename ${BINUTILS}) -C binutils-source --strip 1
+  tar -xf "tarballs/$(basename ${BINUTILS})" -C binutils-source --strip 1
   touch stamps/binutils-extract
 fi
 
@@ -93,25 +93,25 @@ fi
 
 if [ ! -f stamps/gcc-extract ]; then
   mkdir -p gcc-{build,source}
-  tar -xf tarballs/$(basename ${GCC}) -C gcc-source --strip 1
+  tar -xf "tarballs/$(basename ${GCC})" -C gcc-source --strip 1
   touch stamps/gcc-extract
 fi
 
 if [ ! -f stamps/gmp-extract ]; then
   mkdir -p gcc-source/gmp
-  tar -xf tarballs/$(basename ${GMP}) -C gcc-source/gmp --strip 1
+  tar -xf "tarballs/$(basename ${GMP})" -C gcc-source/gmp --strip 1
   touch stamps/gmp-extract
 fi
 
 if [ ! -f stamps/mpfr-extract ]; then
   mkdir -p gcc-source/mpfr
-  tar -xf tarballs/$(basename ${MPFR}) -C gcc-source/mpfr --strip 1
+  tar -xf "tarballs/$(basename ${MPFR})" -C gcc-source/mpfr --strip 1
   touch stamps/mpfr-extract
 fi
 
 if [ ! -f stamps/mpc-extract ]; then
   mkdir -p gcc-source/mpc
-  tar -xf tarballs/$(basename ${MPC}) -C gcc-source/mpc --strip 1
+  tar -xf "tarballs/$(basename ${MPC})" -C gcc-source/mpc --strip 1
   touch stamps/mpc-extract
 fi
 
@@ -123,8 +123,8 @@ if [ ! -f stamps/gcc-configure ]; then
     --prefix="${SCRIPT_DIR}" \
     --target=mips64-elf --with-arch=vr4300 \
     --enable-languages=c,c++ --without-headers --with-newlib \
-    --with-gnu-as=${SCRIPT_DIR}/bin/mips64-elf-as.exe \
-    --with-gnu-ld=${SCRIPT_DIR}/bin/mips64-elf-ld.exe \
+    --with-gnu-as="${SCRIPT_DIR}/bin/mips64-elf-as.exe" \
+    --with-gnu-ld="${SCRIPT_DIR}/bin/mips64-elf-ld.exe" \
     --enable-checking=release \
     --disable-decimal-float \
     --disable-gold \
@@ -181,7 +181,7 @@ fi
 
 if [ ! -f stamps/make-extract ]; then
   mkdir -p make-{build,source}
-  tar -xf tarballs/$(basename ${MAKE}) -C make-source --strip 1
+  tar -xf "tarballs/$(basename ${MAKE})" -C make-source --strip 1
   touch stamps/make-extract
 fi
 
@@ -226,12 +226,12 @@ if [ ! -f stamps/rspasm-build ]; then
 
   make clean
   CC=x86_64-w64-mingw32-gcc RSPASM_LIBS="-lws2_32" make
-  cp rspasm ${SCRIPT_DIR}/bin/rspasm.exe
+  cp rspasm "${SCRIPT_DIR}/bin/rspasm.exe"
 fi
 
-rm -rf "${SCRIPT_DIR}"/../tools/tarballs
-rm -rf "${SCRIPT_DIR}"/../tools/*-source
-rm -rf "${SCRIPT_DIR}"/../tools/*-build
-rm -rf "${SCRIPT_DIR}"/../tools/stamps
+rm -rf "${SCRIPT_DIR}/../tools/tarballs"
+rm -rf "${SCRIPT_DIR}/../tools/*-source"
+rm -rf "${SCRIPT_DIR}/../tools/*-build"
+rm -rf "${SCRIPT_DIR}/../tools/stamps"
 exit 0
 

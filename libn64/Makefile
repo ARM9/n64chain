@@ -27,7 +27,7 @@ CXX := $(N64_GCC_PREFIX)g++
 CFLAGS   := -Wall -Wextra -pedantic -fno-builtin -nostdinc -I. -Iinclude
 CXXFLAGS := $(CFLAGS) -std=c++11 -fno-rtti -fno-exceptions
 CFLAGS   += -std=c99
-OPTFLAGS := -Os -march=vr4300 -flto -ffat-lto-objects \
+OPTFLAGS := -O2 -march=vr4300 -flto -ffat-lto-objects \
 	-mgpopt -G8 -mno-extern-sdata
 
 ASMFILES := $(call FIXPATH,\
