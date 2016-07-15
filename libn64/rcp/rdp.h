@@ -133,10 +133,10 @@
     | SetField(sl,55,44)|SetField(tl,43,32)|SetField(tile,26,24) \
     | SetField(sh,23,12)|SetField(th,11,0)
 
+#define sync_load   0x2600000000000000
 #define sync_pipe   0x2700000000000000
 #define sync_tile   0x2800000000000000
 #define sync_full   0x2900000000000000
-#define sync_load   0x3100000000000000
 #define no_op       0x0000000000000000
 
 /* Triangle coefficient commands */
@@ -159,6 +159,42 @@
 /* Triangle raster commands */
 #define fill_triangle(mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf) \
     edge_coefficients(0x08,mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf, xh,xhf,dxhdy,dxhdyf, xm,xmf,dxmdy,dxmdyf)
+// #define TRIANGLE_BIT    0x08
+// #define SHADED_BIT      0x04
+// #define TEXTURED_BIT    0x02
+// #define ZBUFF_BIT       0x01
+//#define fill_shaded_triangle(bla) \
+//    edge_coefficients(0x0C,) \
+//    , shade_coefficients()
+//
+//#define fill_textured_triangle(bla) \
+//    edge_coefficients(0x0A,) \
+//    , texture_coefficients()
+//
+//#define fill_shaded_textured_triangle(bla) \
+//    edge_coefficients(0x0E,) \
+//    , shade_coefficients() \
+//    , texture_coefficients()
+//
+//#define fill_zbuff_triangle(bla) \
+//    edge_coefficients(0x09,) \
+//    , zbuffer_coefficients()
+//
+//#define fill_shaded_zbuff_triangle(bla) \
+//    edge_coefficients(0x0D,) \
+//    , shade_coefficients() \
+//    , zbuffer_coefficients()
+//
+//#define fill_textured_zbuff_triangle(bla) \
+//    edge_coefficients(0x0B,) \
+//    , texture_coefficients() \
+//    , zbuffer_coefficients()
+//
+//#define fill_shaded_textured_zbuff_triangle(bla) \
+//    edge_coefficients(0x0F,) \
+//    , shade_coefficients() \
+//    , texture_coefficients() \
+//    , zbuffer_coefficients()
 
 #define LEFT_MAJOR  0
 #define RIGHT_MAJOR 1
