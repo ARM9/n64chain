@@ -39,7 +39,15 @@
     );
 }*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void writeback_dcache_all(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

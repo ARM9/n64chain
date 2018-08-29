@@ -11,12 +11,12 @@ set -eu
 # 'LICENSE', which is part of this source code package.
 #
 
-BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.25.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-5.2.0/gcc-5.2.0.tar.bz2"
+BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.26.tar.bz2"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-6.1.0/gcc-6.1.0.tar.bz2"
 MAKE="ftp://ftp.gnu.org/gnu/make/make-4.1.tar.bz2"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
+cd "${SCRIPT_DIR}" && mkdir -p {stamps,tarballs}
 
 export PATH="${PATH}:${SCRIPT_DIR}/bin"
 
@@ -27,7 +27,7 @@ fi
 
 if [ ! -f stamps/binutils-extract ]; then
   mkdir -p binutils-{build,source}
-  tar -xf tarballs/$(basename ${BINUTILS}) -C binutils-source --strip 1
+  tar -xf "tarballs/$(basename ${BINUTILS})" -C binutils-source --strip 1
   touch stamps/binutils-extract
 fi
 
@@ -73,7 +73,7 @@ fi
 
 if [ ! -f stamps/gcc-extract ]; then
   mkdir -p gcc-{build,source}
-  tar -xf tarballs/$(basename ${GCC}) -C gcc-source --strip 1
+  tar -xf "tarballs/$(basename ${GCC})" -C gcc-source --strip 1
   touch stamps/gcc-extract
 fi
 
@@ -85,14 +85,17 @@ if [ ! -f stamps/gcc-prereq ]; then
   touch stamps/gcc-prereq
 fi
 
+#export CFLAGS_FOR_TARGET="-O2"
+#export CXXFLAGS_FOR_TARGET="-O2"
+
 if [ ! -f stamps/gcc-configure ]; then
   pushd gcc-build
   ../gcc-source/configure \
     --prefix="${SCRIPT_DIR}" \
     --target=mips64-elf --with-arch=vr4300 \
-    --enable-languages=c --without-headers --with-newlib \
-    --with-gnu-as=${SCRIPT_DIR}/bin/mips64-elf-as \
-    --with-gnu-ld=${SCRIPT_DIR}/bin/mips64-elf-ld \
+    --enable-languages=c,c++ --without-headers --with-newlib \
+    --with-gnu-as="${SCRIPT_DIR}/bin/mips64-elf-as" \
+    --with-gnu-ld="${SCRIPT_DIR}/bin/mips64-elf-ld" \
     --enable-checking=release \
     --disable-decimal-float \
     --disable-gold \
@@ -105,6 +108,8 @@ if [ ! -f stamps/gcc-configure ]; then
     --disable-libssp \
     --disable-libunwind-exceptions \
     --disable-libvtv \
+    --disable-libstdcxx-pch \
+    --disable-libstdcxx-threads \
     --disable-multilib \
     --disable-nls \
     --disable-shared \
@@ -193,12 +198,12 @@ fi
 if [ ! -f stamps/rspasm-build ]; then
   pushd "${SCRIPT_DIR}/../rspasm"
   make clean && make all
-  cp rspasm ${SCRIPT_DIR}/bin
+  cp rspasm "${SCRIPT_DIR}/bin"
   popd
 
   touch stamps/rspasm-build
 fi
 
-rm -rf tarballs *-source *-build stamps
+rm -rf tarballs ./*-source ./*-build stamps
 exit 0
 

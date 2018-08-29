@@ -71,6 +71,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct vi_state_t {
 	uint32_t status;   // Status and control register
 	uint32_t origin;   // Pointer to uncached buffer in memory to rasterize
@@ -135,6 +139,10 @@ typedef enum
 // Will select the appropriate settings based on detected TV mode
 //
 void vi_setup_res(vi_resolution_t res, vi_state_t *out);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -31,6 +31,22 @@
 #define RSP_PC           IO_32(RSP_PC_BASE,0x00) // $04080000..$04080003 SP: PC Register
 #define RSP_IBIST_REG    IO_32(RSP_PC_BASE,0x04) // $04080004..$04080007 SP: IMEM BIST Register
 
+// R RSP_STATUS
+#define RSP_STATUS_HALTED   (1 << 0)
+#define RSP_STATUS_BREAK    (1 << 1)
+#define RSP_STATUS_DMA_BUSY (1 << 2)
+#define RSP_STATUS_DMA_FULL (1 << 3)
+#define RSP_STATUS_IO_FULL  (1 << 4)
+#define RSP_STATUS_SIG_0    (1 << 5)    // YIELD request
+#define RSP_STATUS_SIG_1    (1 << 6)    // YIELDED
+#define RSP_STATUS_SIG_2    (1 << 7)    // task finished
+#define RSP_STATUS_SIG_3    (1 << 8)
+#define RSP_STATUS_SIG_4    (1 << 9)
+#define RSP_STATUS_SIG_5    (1 << 10)
+#define RSP_STATUS_SIG_6    (1 << 11)
+#define RSP_STATUS_SIG_7    (1 << 12)
+
+// W RSP_STATUS
 #define RSP_STATUS_CLEAR_HALT               (1 <<  0)
 #define RSP_STATUS_SET_HALT                 (1 <<  1)
 #define RSP_STATUS_CLEAR_BROKE              (1 <<  2)
@@ -60,6 +76,11 @@
 #ifndef __LANGUAGE_ASSEMBLY
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //
 // Issues a DMA to the RSP.
 //
@@ -104,6 +125,10 @@ static inline void rsp_set_status(uint32_t mask) {
   *RSP_STATUS = mask;
 }
 
+static inline void rsp_get_status(uint32_t mask) {
+  return *RSP_STATUS;
+}
+
 //
 // Set clean state
 static inline void rsp_init (void) {
@@ -128,13 +153,18 @@ static inline void rsp_init (void) {
 //
 // Load and run a microcode
 //
-static inline void rsp_run (void *ucode) {
+void rsp_run (void *ucode) {
     while(rsp_is_dma_pending()) {}
     rsp_issue_dma_to_rsp(ucode, 0x1000, 0xfff);
     while(rsp_is_dma_pending()) {}
     rsp_set_pc(0);
     rsp_set_status(RSP_STATUS_CLEAR_HALT);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 #endif

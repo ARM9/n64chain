@@ -1,5 +1,5 @@
 //
-// libn64/rcp/pi.h: Peripheral interface.
+// libn64/rcp/pi.h: Parallel(?) interface.
 //
 #ifndef LIBN64_RCP_PI_H
 #define LIBN64_RCP_PI_H
@@ -40,12 +40,20 @@
 #ifndef __LANGUAGE_ASSEMBLY
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Call before writing any PI register (except PI_STATUS) */
 static inline void pi_wait() {
     while(*PI_STATUS & (PI_IO_BUSY|PI_DMA_BUSY)) {}
 }
 
 void pi_dma_rom_to_dram(void *dest, const void *src, uint32_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

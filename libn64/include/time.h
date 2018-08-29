@@ -23,6 +23,10 @@ typedef unsigned long clock_t;
     nseconds_t tv_nsec;
 };*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct timeval {
     time_t tv_sec;
     time_t tv_usec;
@@ -42,5 +46,9 @@ clock_t get_ticks(void);
 clock_t get_ticks_ms(void);
 
 clock_t get_ticks_us(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

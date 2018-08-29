@@ -24,6 +24,18 @@
 #define DPS_BUFTEST_ADDR    IO_32(DPS_BASE,0x08) // $04200008..$0420000B DPS: Span Buffer Test Address Register
 #define DPS_BUFTEST_DATA    IO_32(DPS_BASE,0x0C) // $0420000C..$0420000F DPS: Span Buffer Test Data Register
 
+#define DPC_STATUS_XBUS_DMEM_DMA        (1 << 0)
+#define DPC_STATUS_FREEZE               (1 << 1)
+#define DPC_STATUS_FLUSH                (1 << 2)
+#define DPC_STATUS_START_GCLK           (1 << 3)
+#define DPC_STATUS_TMEM_BUSY            (1 << 4)
+#define DPC_STATUS_PIPE_BUSY            (1 << 5)
+#define DPC_STATUS_CMD_BUSY             (1 << 6)
+#define DPC_STATUS_CBUF_READY           (1 << 7)
+#define DPC_STATUS_DMA_BUSY             (1 << 8)
+#define DPC_STATUS_END_VALID            (1 << 9)
+#define DPC_STATUS_START_VALID          (1 << 10)
+
 /* RDP command macros (C and assembly compatible) */
 #define set_scissor(xh, yh, f, xl, yl) 0x2D00000000000000 \
     | SetField(xh,55,44)|SetField(yh,43,32) \
@@ -133,15 +145,18 @@
     | SetField(sl,55,44)|SetField(tl,43,32)|SetField(tile,26,24) \
     | SetField(sh,23,12)|SetField(th,11,0)
 
+#define sync_load   0x2600000000000000
 #define sync_pipe   0x2700000000000000
 #define sync_tile   0x2800000000000000
 #define sync_full   0x2900000000000000
-#define sync_load   0x3100000000000000
 #define no_op       0x0000000000000000
 
 /* Triangle coefficient commands */
-#define edge_coefficients(xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf) \
-    SetField(xl,63,48)|SetField(xlf,47,32)|SetField(dxldy,31,16) \
+#define edge_coefficients(command,mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf, xh,xhf,dxhdy,dxhdyf, xm,xmf,dxmdy,dxmdyf) \
+    SetField(command,61,56) \
+    | SetField(mf,55,55)|SetField(miplvl,53,51)|SetField(tile,50,48) \
+    | SetField(yl,45,32)|SetField(ym,29,16)|SetField(yh,13,0) \
+    , SetField(xl,63,48)|SetField(xlf,47,32)|SetField(dxldy,31,16) \
     | SetField(dxldyf,15,0) \
     , SetField(xh,63,48)|SetField(xhf,47,32)|SetField(dxhdy,31,16) \
     | SetField(dxhdyf,15,0) \
@@ -149,26 +164,76 @@
     | SetField(dxmdy,31,16)|SetField(dxmdyf,15,0)
 
 // TODO
-#define shade_coefficients()
-#define texture_coefficients()
-#define zbuffer_coefficients()
+//#define shade_coefficients()
+//#define texture_coefficients()
 
 /* Triangle raster commands */
-#define fill_triangle(mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf) 0x0800000000000000 \
-    | SetField(mf,55,55)|SetField(miplvl,53,51)|SetField(tile,50,48) \
-    | SetField(yl,45,32)|SetField(ym,29,16)|SetField(yh,13,0) \
-    , edge_coefficients(xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf)
+#define fill_triangle(mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf,xh,xhf,dxhdy,dxhdyf,xm,xmf,dxmdy,dxmdyf) \
+    edge_coefficients(0x08,mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf, xh,xhf,dxhdy,dxhdyf, xm,xmf,dxmdy,dxmdyf)
+// #define TRIANGLE_BIT    0x08
+// #define SHADED_BIT      0x04
+// #define TEXTURED_BIT    0x02
+// #define ZBUFF_BIT       0x01
+
+#define zbuffer_coefficients(z,zf, dzdx,dzdxf, dzde,dzdef, dzdy,dzdyf) \
+    SetField(z,63,48) | SetField(zf,47,32) \
+    | SetField(dzdx,31,16) | SetField(dzdxf,15,0) \
+    , SetField(dzde,63,48) | SetField(dzdef,47,32) \
+    | SetField(dzdy,31,16) | SetField(dzdyf,15,0)
+
+#define fill_zbuffer_triangle(...) \
+    edge_coefficients(0x09, __VA_ARGS__)
+/*
+#define fill_shaded_triangle(bla) \
+    edge_coefficients(0x0C,) \
+    , shade_coefficients()
+
+#define fill_textured_triangle(bla) \
+    edge_coefficients(0x0A,) \
+    , texture_coefficients()
+
+#define fill_shaded_textured_triangle(bla) \
+    edge_coefficients(0x0E,) \
+    , shade_coefficients() \
+    , texture_coefficients()
+
+#define fill_shaded_zbuff_triangle(bla) \
+    edge_coefficients(0x0D,) \
+    , shade_coefficients() \
+    , zbuffer_coefficients()
+
+#define fill_textured_zbuff_triangle(bla) \
+    edge_coefficients(0x0B,) \
+    , texture_coefficients() \
+    , zbuffer_coefficients()
+
+#define fill_shaded_textured_zbuff_triangle(bla) \
+    edge_coefficients(0x0F,) \
+    , shade_coefficients() \
+    , texture_coefficients() \
+    , zbuffer_coefficients()
+*/
+
+#define LEFT_MAJOR  0
+#define RIGHT_MAJOR 1
 
 #define fill_rectangle(x0, y0, x1, y1) 0x3600000000000000 \
     | SetField(x1,55,44)|SetField(y1,43,32) \
     | SetField(x0,23,12)|SetField(y0,11,0)
 
 // TODO WARNING mixed info on this
-#define texture_rectangle(x0) 0x2400000000000000 \
-    | SetField(x0,55,44) \
-    , ()
+#define texture_rectangle(xh,yh,tile,xl,yl,s,t,dsdx,dtdy) 0x2400000000000000 \
+    | SetField(xh,55,44)|SetField(yh,43,32)|SetField(tile,26,24) \
+    | SetField(xl,23,12)|SetField(yl,11,0) \
+    , SetField(s,63,48)|SetField(t,47,32) \
+    | SetField(dsdx,31,16)|SetField(dtdy,15,0)
 
-#define texture_rectangle_flip()
+#define texture_rectangle_flip(xh,yh,tile,xl,yl,s,t,dsdx,dtdy) \
+    0x2500000000000000 \
+    | SetField(xh,55,44)|SetField(yh,43,32)|SetField(tile,26,24) \
+    | SetField(xl,23,12)|SetField(yl,11,0) \
+    , SetField(s,63,48)|SetField(t,47,32) \
+    | SetField(dsdx,31,16)|SetField(dtdy,15,0)
 
 // TODO flags could be organized a bit better...
 /* Flags lifted from PeterLemon/N64 */
@@ -330,7 +395,26 @@
 
 typedef uint64_t rdp_cmd;
 
-void run_dpc(const void *list, uint32_t len);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void rdp_exec(const void *list, uint32_t len);
+
+static inline int rdp_is_dma_pending () {
+    return *DPC_STATUS & DPC_STATUS_DMA_BUSY;
+}
+
+static inline int rdp_is_busy () {
+    return *DPC_CURRENT != *DPC_END;
+    //return *DPC_STATUS & (DPC_STATUS_PIPE_BUSY
+                        //| DPC_STATUS_CMD_BUSY
+                        //| DPC_STATUS_DMA_BUSY);
+}
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
