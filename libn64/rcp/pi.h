@@ -45,7 +45,7 @@ static inline void pi_wait() {
     while(*PI_STATUS & (PI_IO_BUSY|PI_DMA_BUSY)) {}
 }
 
-void dma_rom_to_dram(void *dest, const void *src, uint32_t size);
+void pi_dma_rom_to_dram(void *dest, const void *src, uint32_t size);
 
 #endif
 

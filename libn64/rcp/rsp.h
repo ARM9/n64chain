@@ -14,8 +14,8 @@
 #include <mmio.h>
 
 #define RSP_MEM_BASE     0xA4000000 // $04000000..$04000FFF SP MEM Base Register
-#define RSP_DMEM         IO_32(RSP_MEM_BASE,0x0000) // $04000000..$04000FFF SP: RSP DMEM (4096 Bytes)
-#define RSP_IMEM         IO_32(RSP_MEM_BASE,0x1000) // $04001000..$04001FFF SP: RSP IMEM (4096 Bytes)
+#define RSP_DMEM         (RSP_MEM_BASE+0x0000) // $04000000..$04000FFF SP: RSP DMEM (4096 Bytes)
+#define RSP_IMEM         (RSP_MEM_BASE+0x1000) // $04001000..$04001FFF SP: RSP IMEM (4096 Bytes)
 
 #define RSP_BASE         0xA4040000 // $04040000..$0404001F SP Base Register
 #define RSP_MEM_ADDR     IO_32(RSP_BASE,0x00) // $04040000..$04040003 SP: Master, SP Memory Address Register
@@ -68,7 +68,7 @@
 // the amount you actually want copied), etc.
 //
 static inline void rsp_issue_dma_to_rsp(
-  uint32_t paddr, uint32_t sp_addr, size_t len) {
+  void *paddr, uint32_t sp_addr, size_t len) {
   __asm__ __volatile__(
     "sw %[sp_addr], 0x00(%[sp_region])\n\t"
     "sw %[paddr], 0x04(%[sp_region])\n\t"
@@ -102,6 +102,38 @@ static inline void rsp_set_pc(uint32_t pc) {
 //
 static inline void rsp_set_status(uint32_t mask) {
   *RSP_STATUS = mask;
+}
+
+//
+// Set clean state
+static inline void rsp_init (void) {
+    while(rsp_is_dma_pending()) {}
+    rsp_set_status(
+            RSP_STATUS_SET_HALT |
+            RSP_STATUS_CLEAR_BROKE |
+            RSP_STATUS_CLEAR_INTR |
+            RSP_STATUS_CLEAR_SSTEP |
+            RSP_STATUS_CLEAR_INTR_ON_BREAK |
+            RSP_STATUS_CLEAR_SIGNAL_0 |
+            RSP_STATUS_CLEAR_SIGNAL_1 |
+            RSP_STATUS_CLEAR_SIGNAL_2 |
+            RSP_STATUS_CLEAR_SIGNAL_3 |
+            RSP_STATUS_CLEAR_SIGNAL_4 |
+            RSP_STATUS_CLEAR_SIGNAL_5 |
+            RSP_STATUS_CLEAR_SIGNAL_6 |
+            RSP_STATUS_CLEAR_SIGNAL_7
+            );
+}
+
+//
+// Load and run a microcode
+//
+static inline void rsp_run (void *ucode) {
+    while(rsp_is_dma_pending()) {}
+    rsp_issue_dma_to_rsp(ucode, 0x1000, 0xfff);
+    while(rsp_is_dma_pending()) {}
+    rsp_set_pc(0);
+    rsp_set_status(RSP_STATUS_CLEAR_HALT);
 }
 #endif
 

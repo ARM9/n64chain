@@ -24,7 +24,7 @@ AR := $(N64_GCC_PREFIX)ar
 CC := $(N64_GCC_PREFIX)gcc
 
 CFLAGS := -Wall -Wextra -pedantic -std=c99 -fno-builtin -nostdinc -I. -Iinclude
-OPTFLAGS := -Os -march=vr4300 -flto -ffat-lto-objects \
+OPTFLAGS := -Os -march=vr4300 -mabi=o64 -flto -ffat-lto-objects \
 	-mgpopt -G8 -mno-extern-sdata
 
 ASMFILES := $(call FIXPATH,\
