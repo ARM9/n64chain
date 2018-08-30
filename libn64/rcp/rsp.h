@@ -125,7 +125,7 @@ static inline void rsp_set_status(uint32_t mask) {
   *RSP_STATUS = mask;
 }
 
-static inline void rsp_get_status(uint32_t mask) {
+static inline uint32_t rsp_get_status() {
   return *RSP_STATUS;
 }
 
