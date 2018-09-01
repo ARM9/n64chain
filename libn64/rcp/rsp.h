@@ -109,6 +109,9 @@ static inline uint32_t rsp_is_dma_pending(void) {
   return *RSP_DMA_BUSY;
 }
 
+static inline uint32_t rsp_busy (void) {
+    return ! (*RSP_STATUS & (RSP_STATUS_HALTED | RSP_STATUS_BREAK));
+}
 //
 // Sets the RSP PC register.
 //
@@ -150,15 +153,20 @@ static inline void rsp_init (void) {
             );
 }
 
-//
-// Load and run a microcode
-//
-void rsp_run (void *ucode) {
-    while(rsp_is_dma_pending()) {}
-    rsp_issue_dma_to_rsp(ucode, 0x1000, 0xfff);
-    while(rsp_is_dma_pending()) {}
-    rsp_set_pc(0);
-    rsp_set_status(RSP_STATUS_CLEAR_HALT);
+
+static inline int rsp_get_semaphore (void) {
+    return *RSP_SEMAPHORE;
+}
+
+static inline void rsp_load (void *src, uint32_t start, uint32_t len) {
+    while (rsp_is_dma_pending());
+    rsp_issue_dma_to_rsp(src, start, len);
+    while (rsp_is_dma_pending());
+}
+
+static inline void rsp_run (uint32_t pc) {
+    rsp_set_pc(pc);
+    rsp_set_status(RSP_STATUS_CLEAR_HALT | RSP_STATUS_CLEAR_BROKE);
 }
 
 #ifdef __cplusplus

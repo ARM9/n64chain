@@ -140,6 +140,8 @@ typedef enum
 //
 void vi_setup_res(vi_resolution_t res, vi_state_t *out);
 
+void vi_wait_scanline (unsigned line);
+
 #ifdef __cplusplus
 }
 #endif

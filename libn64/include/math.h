@@ -27,53 +27,111 @@ static inline float cosf(float x) {
 
 static inline float fabsf(float f) {
 	float res;
-
 	__asm__ __volatile__(
 		"abs.s %0, %1\n\t"
 
 		: "=f"(res)
 		: "f"(f)
 	);
-
 	return res;
 }
 
 static inline double fabs(double d) {
 	double res;
-
 	__asm__ __volatile__(
 		"abs.d %0, %1\n\t"
 
 		: "=f"(res)
 		: "f"(d)
 	);
-
 	return res;
 }
 
 static inline double sqrt(double d) {
 	double res;
-
 	__asm__ __volatile__(
 		"sqrt.d %0, %1\n\t"
 
 		: "=f"(res)
 		: "f"(d)
 	);
-
 	return res;
 }
 
 static inline float sqrtf(float f) {
 	float res;
-
 	__asm__ __volatile__(
 		"sqrt.s %0, %1\n\t"
 
 		: "=f"(res)
 		: "f"(f)
 	);
+	return res;
+}
 
+static inline double floor(double f) {
+	double res;
+	__asm__ __volatile__(
+		"floor.l.d %0, %1\n\t"
+                "cvt.d.l %0, %0\n\t"
+		: "=f"(res)
+		: "f"(f)
+	);
+	return res;
+}
+
+static inline float floorf(float f) {
+	float res;
+	__asm__ __volatile__(
+		"floor.w.s %0, %1\n\t"
+                "cvt.s.w %0, %0\n\t"
+		: "=f"(res)
+		: "f"(f)
+	);
+	return res;
+}
+
+static inline double ceil(double f) {
+	double res;
+	__asm__ __volatile__(
+		"ceil.l.d %0, %1\n\t"
+                "cvt.d.l %0, %0\n\t"
+		: "=f"(res)
+		: "f"(f)
+	);
+	return res;
+}
+
+static inline float ceilf(float f) {
+	float res;
+	__asm__ __volatile__(
+		"ceil.w.s %0, %1\n\t"
+                "cvt.s.w %0, %0\n\t"
+		: "=f"(res)
+		: "f"(f)
+	);
+	return res;
+}
+
+static inline double round(double f) {
+	double res;
+	__asm__ __volatile__(
+		"round.l.d %0, %1\n\t"
+                "cvt.d.l %0, %0\n\t"
+		: "=f"(res)
+		: "f"(f)
+	);
+	return res;
+}
+
+static inline float roundf(float f) {
+	float res;
+	__asm__ __volatile__(
+		"round.w.s %0, %1\n\t"
+                "cvt.s.w %0, %0\n\t"
+		: "=f"(res)
+		: "f"(f)
+	);
 	return res;
 }
 

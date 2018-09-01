@@ -160,7 +160,7 @@
     , SetField(xm,63,48)|SetField(xmf,47,32) | SetField(dxmdy,31,16)|SetField(dxmdyf,15,0)
 
 
-#define shade_coefficients(r,g,b,a, drdx, dhdx, dbdx, dadx, rf,gf,bf,af, drdxf,dgdxf,dbdxf,dadxf, drde,dgde,dbde,dade, drdy,dgdy,dbdy,dady, drdef,dgdef,dbdef,dadef, drdyf,dgdyf,dbdyf,dadyf) \
+#define shade_coefficients(r,g,b,a, drdx,dgdx,dbdx,dadx, rf,gf,bf,af, drdxf,dgdxf,dbdxf,dadxf, drde,dgde,dbde,dade, drdy,dgdy,dbdy,dady, drdef,dgdef,dbdef,dadef, drdyf,dgdyf,dbdyf,dadyf) \
     SetField(r,63,48) | SetField(g,47,32) | SetField(b,31,16) | SetField(a,15,0) \
     , SetField(drdx,63,48) | SetField(dgdx,47,32) | SetField(dbdx,31,16) | SetField(dadx,15,0) \
     , SetField(rf,63,48) | SetField(gf,47,32) | SetField(bf,31,16) | SetField(af,15,0) \
@@ -190,11 +190,9 @@
 // #define TEXTURED_BIT    0x02
 // #define ZBUFF_BIT       0x01
 
-#define zbuffer_coefficients(z,zf, dzdx,dzdxf, dzde,dzdef, dzdy,dzdyf) \
-    SetField(z,63,48) | SetField(zf,47,32) \
-    | SetField(dzdx,31,16) | SetField(dzdxf,15,0) \
-    , SetField(dzde,63,48) | SetField(dzdef,47,32) \
-    | SetField(dzdy,31,16) | SetField(dzdyf,15,0)
+#define zbuffer_coefficients(z, dzdx, dzde, dzdy) \
+    SetField(z,63,32) | SetField(dzdx,31,0) \
+    , SetField(dzde,63,32) | SetField(dzdy,31,0)
 
 
 #define fill_shaded_triangle(...) \
@@ -420,7 +418,7 @@ static inline int rdp_is_dma_pending () {
     return *DPC_STATUS & DPC_STATUS_DMA_BUSY;
 }
 
-static inline int rdp_is_busy () {
+static inline int rdp_busy () {
     return *DPC_CURRENT != *DPC_END;
     //return *DPC_STATUS & (DPC_STATUS_PIPE_BUSY
                         //| DPC_STATUS_CMD_BUSY

@@ -111,3 +111,8 @@ void vi_setup_res(vi_resolution_t res, vi_state_t *out) {
     }
     memcpy(out, vi_modes[tv_mode], sizeof(vi_state_t));
 }
+
+void vi_wait_scanline (unsigned line) {
+    while ( *VI_V_CURRENT_LINE != line);
+}
+
