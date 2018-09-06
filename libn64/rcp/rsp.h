@@ -14,8 +14,8 @@
 #include <mmio.h>
 
 #define RSP_MEM_BASE     0xA4000000 // $04000000..$04000FFF SP MEM Base Register
-#define RSP_DMEM         IO_32(RSP_MEM_BASE,0x0000) // $04000000..$04000FFF SP: RSP DMEM (4096 Bytes)
-#define RSP_IMEM         IO_32(RSP_MEM_BASE,0x1000) // $04001000..$04001FFF SP: RSP IMEM (4096 Bytes)
+#define RSP_DMEM         (RSP_MEM_BASE+0x0000) // $04000000..$04000FFF SP: RSP DMEM (4096 Bytes)
+#define RSP_IMEM         (RSP_MEM_BASE+0x1000) // $04001000..$04001FFF SP: RSP IMEM (4096 Bytes)
 
 #define RSP_BASE         0xA4040000 // $04040000..$0404001F SP Base Register
 #define RSP_MEM_ADDR     IO_32(RSP_BASE,0x00) // $04040000..$04040003 SP: Master, SP Memory Address Register
@@ -31,6 +31,22 @@
 #define RSP_PC           IO_32(RSP_PC_BASE,0x00) // $04080000..$04080003 SP: PC Register
 #define RSP_IBIST_REG    IO_32(RSP_PC_BASE,0x04) // $04080004..$04080007 SP: IMEM BIST Register
 
+// R RSP_STATUS
+#define RSP_STATUS_HALTED   (1 << 0)
+#define RSP_STATUS_BREAK    (1 << 1)
+#define RSP_STATUS_DMA_BUSY (1 << 2)
+#define RSP_STATUS_DMA_FULL (1 << 3)
+#define RSP_STATUS_IO_FULL  (1 << 4)
+#define RSP_STATUS_SIG_0    (1 << 5)    // YIELD request
+#define RSP_STATUS_SIG_1    (1 << 6)    // YIELDED
+#define RSP_STATUS_SIG_2    (1 << 7)    // task finished
+#define RSP_STATUS_SIG_3    (1 << 8)
+#define RSP_STATUS_SIG_4    (1 << 9)
+#define RSP_STATUS_SIG_5    (1 << 10)
+#define RSP_STATUS_SIG_6    (1 << 11)
+#define RSP_STATUS_SIG_7    (1 << 12)
+
+// W RSP_STATUS
 #define RSP_STATUS_CLEAR_HALT               (1 <<  0)
 #define RSP_STATUS_SET_HALT                 (1 <<  1)
 #define RSP_STATUS_CLEAR_BROKE              (1 <<  2)
@@ -73,7 +89,7 @@ extern "C" {
 // the amount you actually want copied), etc.
 //
 static inline void rsp_issue_dma_to_rsp(
-  uint32_t paddr, uint32_t sp_addr, size_t len) {
+  void *paddr, uint32_t sp_addr, size_t len) {
   __asm__ __volatile__(
     "sw %[sp_addr], 0x00(%[sp_region])\n\t"
     "sw %[paddr], 0x04(%[sp_region])\n\t"
@@ -93,6 +109,9 @@ static inline uint32_t rsp_is_dma_pending(void) {
   return *RSP_DMA_BUSY;
 }
 
+static inline uint32_t rsp_busy (void) {
+    return ! (*RSP_STATUS & (RSP_STATUS_HALTED | RSP_STATUS_BREAK));
+}
 //
 // Sets the RSP PC register.
 //
@@ -107,6 +126,47 @@ static inline void rsp_set_pc(uint32_t pc) {
 //
 static inline void rsp_set_status(uint32_t mask) {
   *RSP_STATUS = mask;
+}
+
+static inline uint32_t rsp_get_status() {
+  return *RSP_STATUS;
+}
+
+//
+// Set clean state
+static inline void rsp_init (void) {
+    while(rsp_is_dma_pending()) {}
+    rsp_set_status(
+            RSP_STATUS_SET_HALT |
+            RSP_STATUS_CLEAR_BROKE |
+            RSP_STATUS_CLEAR_INTR |
+            RSP_STATUS_CLEAR_SSTEP |
+            RSP_STATUS_CLEAR_INTR_ON_BREAK |
+            RSP_STATUS_CLEAR_SIGNAL_0 |
+            RSP_STATUS_CLEAR_SIGNAL_1 |
+            RSP_STATUS_CLEAR_SIGNAL_2 |
+            RSP_STATUS_CLEAR_SIGNAL_3 |
+            RSP_STATUS_CLEAR_SIGNAL_4 |
+            RSP_STATUS_CLEAR_SIGNAL_5 |
+            RSP_STATUS_CLEAR_SIGNAL_6 |
+            RSP_STATUS_CLEAR_SIGNAL_7
+            );
+}
+
+
+static inline int rsp_get_semaphore (void) {
+    return *RSP_SEMAPHORE;
+}
+
+static inline void rsp_load (void *src, uint32_t start, uint32_t len) {
+    while (rsp_is_dma_pending());
+    rsp_issue_dma_to_rsp(src, start, len);
+    while (rsp_is_dma_pending());
+}
+
+static inline void rsp_run (uint32_t pc) {
+    rsp_set_pc(pc);
+    rsp_set_status(RSP_STATUS_CLEAR_HALT | RSP_STATUS_CLEAR_BROKE);
 }
 
 #ifdef __cplusplus

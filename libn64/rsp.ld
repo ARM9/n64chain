@@ -9,8 +9,8 @@ EXTERN(_start)
 ENTRY(_start)
 
 MEMORY {
-    iram : ORIGIN = 0x0000, LENGTH = 0x1000
-    dram : ORIGIN = 0x1000, LENGTH = 0x1000
+    dram : ORIGIN = 0x0000, LENGTH = 0x1000
+    iram : ORIGIN = 0x1000, LENGTH = 0x1000
 }
 
 SECTIONS {
@@ -28,7 +28,7 @@ SECTIONS {
     __iram_lma_start = LOADADDR (.text);
     __iram_lma_end = LOADADDR (.text) + SIZEOF (.text);
 
-    /* no rodata since there's no read only memory */
+    /* there's no read only memory */
     /DISCARD/ : { *(.rodata .rodata.* .rdata .rdata.*) }
 
     . = ORIGIN(dram);
@@ -37,6 +37,7 @@ SECTIONS {
     .data : AT (ADDR (.text) + SIZEOF (.text)) {
         *(.data)
         *(.data.*)
+        /**(.rodata .rodata.* .rdata .rdata.*)*/
     } > dram
     .sdata : AT (ADDR (.data) + SIZEOF (.data)) {
         *(.sdata)
