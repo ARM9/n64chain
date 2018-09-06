@@ -5,20 +5,23 @@ set -eu
 # tools/build-linux64-toolchain.sh: Linux toolchain build script.
 #
 # n64chain: A (free) open-source N64 development toolchain.
-# Copyright 2014-15 Tyler J. Stachecki <tstache1@binghamton.edu>
+# Copyright 2014-16 Tyler J. Stachecki <stachecki.tyler@gmail.com>
 #
 # This file is subject to the terms and conditions defined in
 # 'LICENSE', which is part of this source code package.
 #
 
-BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.26.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-6.1.0/gcc-6.1.0.tar.bz2"
-MAKE="ftp://ftp.gnu.org/gnu/make/make-4.1.tar.bz2"
+BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.28.tar.bz2"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-7.1.0/gcc-7.1.0.tar.bz2"
+MAKE="ftp://ftp.gnu.org/gnu/make/make-4.2.tar.bz2"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${SCRIPT_DIR}" && mkdir -p {stamps,tarballs}
 
 export PATH="${PATH}:${SCRIPT_DIR}/bin"
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
 
 if [ ! -f stamps/binutils-download ]; then
   wget "${BINUTILS}" -O "tarballs/$(basename ${BINUTILS})"
@@ -27,7 +30,7 @@ fi
 
 if [ ! -f stamps/binutils-extract ]; then
   mkdir -p binutils-{build,source}
-  tar -xf "tarballs/$(basename ${BINUTILS})" -C binutils-source --strip 1
+  tar -xf tarballs/$(basename ${BINUTILS}) -C binutils-source --strip 1
   touch stamps/binutils-extract
 fi
 
@@ -52,7 +55,7 @@ fi
 
 if [ ! -f stamps/binutils-build ]; then
   pushd binutils-build
-  make
+  make -j9
   popd
 
   touch stamps/binutils-build
@@ -73,20 +76,9 @@ fi
 
 if [ ! -f stamps/gcc-extract ]; then
   mkdir -p gcc-{build,source}
-  tar -xf "tarballs/$(basename ${GCC})" -C gcc-source --strip 1
+  tar -xf tarballs/$(basename ${GCC}) -C gcc-source --strip 1
   touch stamps/gcc-extract
 fi
-
-if [ ! -f stamps/gcc-prereq ]; then
-  pushd gcc-source
-    ./contrib/download_prerequisites
-  popd
-
-  touch stamps/gcc-prereq
-fi
-
-#export CFLAGS_FOR_TARGET="-O2"
-#export CXXFLAGS_FOR_TARGET="-O2"
 
 if [ ! -f stamps/gcc-configure ]; then
   pushd gcc-build
@@ -94,8 +86,8 @@ if [ ! -f stamps/gcc-configure ]; then
     --prefix="${SCRIPT_DIR}" \
     --target=mips64-elf --with-arch=vr4300 \
     --enable-languages=c,c++ --without-headers --with-newlib \
-    --with-gnu-as="${SCRIPT_DIR}/bin/mips64-elf-as" \
-    --with-gnu-ld="${SCRIPT_DIR}/bin/mips64-elf-ld" \
+    --with-gnu-as=${SCRIPT_DIR}/bin/mips64-elf-as \
+    --with-gnu-ld=${SCRIPT_DIR}/bin/mips64-elf-ld \
     --enable-checking=release \
     --disable-decimal-float \
     --disable-gold \
@@ -126,7 +118,7 @@ fi
 
 if [ ! -f stamps/gcc-build ]; then
   pushd gcc-build
-  make all-gcc
+  make -j9 all-gcc
   popd
 
   touch stamps/gcc-build
@@ -171,7 +163,7 @@ fi
 
 if [ ! -f stamps/make-build ]; then
   pushd make-build
-  make
+  make -j9
   popd
 
   touch stamps/make-build
@@ -186,24 +178,20 @@ if [ ! -f stamps/make-install ]; then
 fi
 
 if [ ! -f stamps/checksum-build ]; then
-  CFLAGS="-Wall -Wextra -pedantic -std=c99 -O2"
-  if [[ "$OSTYPE" != "darwin"* ]]; then
-    CFLAGS="$CFLAGS -static"
-  fi
-  cc ${CFLAGS} checksum.c -o bin/checksum
+  cc -Wall -Wextra -pedantic -std=c99 -static -O2 checksum.c -o bin/checksum
 
   touch stamps/checksum-build
 fi
 
 if [ ! -f stamps/rspasm-build ]; then
   pushd "${SCRIPT_DIR}/../rspasm"
-  make clean && make all
-  cp rspasm "${SCRIPT_DIR}/bin"
-  popd
 
-  touch stamps/rspasm-build
+  make clean && make all
+  cp rspasm ${SCRIPT_DIR}/bin
 fi
 
-rm -rf tarballs ./*-source ./*-build stamps
+rm -rf "${SCRIPT_DIR}"/../tools/tarballs
+rm -rf "${SCRIPT_DIR}"/../tools/*-source
+rm -rf "${SCRIPT_DIR}"/../tools/*-build
+rm -rf "${SCRIPT_DIR}"/../tools/stamps
 exit 0
-

@@ -24,8 +24,8 @@ AR  := $(N64_GCC_PREFIX)ar
 CC  := $(N64_GCC_PREFIX)gcc
 CXX := $(N64_GCC_PREFIX)g++
 
-CFLAGS   := -Wall -Wextra -pedantic -fno-builtin -nostdinc -I. -Iinclude
-CXXFLAGS := $(CFLAGS) -std=c++11 -fno-rtti -fno-exceptions
+CFLAGS   := -Wall -Wextra -pedantic -fno-builtin -nostdinc -mabi=o64 -mlong32 -I. -Iinclude
+CXXFLAGS := $(CFLAGS) -std=c++14 -fno-rtti -fno-exceptions
 CFLAGS   += -std=c99
 OPTFLAGS := -O2 -march=vr4300 -flto -ffat-lto-objects \
 	-mgpopt -G8 -mno-extern-sdata
