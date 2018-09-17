@@ -15,4 +15,7 @@
 //*RESERVED*:      #define $14 // $04800014..$04800017 SI: Reserved Register
 #define SI_STATUS IO_32(SI_BASE,0x18) // $04800018..$0480001B SI: Status Register
 
+#define SI_STATUS_DMA_BUSY      (1<<0)
+#define SI_STATUS_IO_BUSY       (1<<1)
+#define SI_STATUS_DMA_ERROR     (1<<3)
 #endif

@@ -152,12 +152,12 @@
 #define no_op       0x0000000000000000
 
 /* Triangle coefficient commands */
-#define edge_coefficients(command,mf,miplvl,tile,yl,ym,yh, xl,xlf,dxldy,dxldyf, xh,xhf,dxhdy,dxhdyf, xm,xmf,dxmdy,dxmdyf) \
+#define edge_coefficients(command,mf,miplvl,tile,yl,ym,yh, xl,dxldy, xh,dxhdy, xm,dxmdy) \
     SetField(command,61,56) \
     | SetField(mf,55,55)|SetField(miplvl,53,51)|SetField(tile,50,48) | SetField(yl,45,32)|SetField(ym,29,16)|SetField(yh,13,0) \
-    , SetField(xl,63,48)|SetField(xlf,47,32)|SetField(dxldy,31,16)|SetField(dxldyf,15,0) \
-    , SetField(xh,63,48)|SetField(xhf,47,32)|SetField(dxhdy,31,16)|SetField(dxhdyf,15,0) \
-    , SetField(xm,63,48)|SetField(xmf,47,32) | SetField(dxmdy,31,16)|SetField(dxmdyf,15,0)
+    , SetField(xl,63,32)|SetField(dxldy,31,0) \
+    , SetField(xh,63,32)|SetField(dxhdy,31,0) \
+    , SetField(xm,63,32)|SetField(dxmdy,31,0)
 
 
 #define shade_coefficients(r,g,b,a, drdx,dgdx,dbdx,dadx, rf,gf,bf,af, drdxf,dgdxf,dbdxf,dadxf, drde,dgde,dbde,dade, drdy,dgdy,dbdy,dady, drdef,dgdef,dbdef,dadef, drdyf,dgdyf,dbdyf,dadyf) \
